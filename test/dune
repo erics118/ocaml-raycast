@@ -1,0 +1,5 @@
+(library
+ (name test_raycast)
+ (libraries raycast core)
+ (preprocess
+  (pps ppx_inline_test)))
