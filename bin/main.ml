@@ -9,33 +9,32 @@ let hit_sphere center radius r =
   let h = V.dot oc (R.direction r) in
   let c = V.norm2 oc -. (radius *. radius) in
   let discriminant = (h *. h) -. (a *. c) in
-  if Float.(discriminant < 0.0) then -1.0
+  if Float.(discriminant < 0.) then -1.
   else
     let sqrt_d = sqrt discriminant in
     let t1 = (-.h -. sqrt_d) /. a in
     let t2 = (-.h +. sqrt_d) /. a in
-    if Float.(t1 > 0.0) then t1 else if Float.(t2 > 0.0) then t2 else -1.0
+    if Float.(t1 > 0.) then t1 else if Float.(t2 > 0.) then t2 else -1.
 
 let ray_color r =
   let t = hit_sphere (V.make 0. 0. (-1.)) 0.5 r in
-  if Float.(t > 0.0) then
+  if Float.(t > 0.) then
     let n = VInfix.(V.normalize (R.at r t - V.make 0. 0. (-1.))) in
-    V.scale 0.5 (V.make (V.x n +. 1.0) (V.y n +. 1.0) (V.z n +. 1.0))
+    V.scale 0.5 (V.make (V.x n +. 1.) (V.y n +. 1.) (V.z n +. 1.))
   else
     let unit_direction = V.normalize (R.direction r) in
-    let a = 0.5 *. (V.y unit_direction +. 1.0) in
-    VInfix.(
-      V.scale (1.0 -. a) (V.make 1.0 1.0 1.0) + V.scale a (V.make 0.5 0.7 1.0))
+    let a = 0.5 *. (V.y unit_direction +. 1.) in
+    VInfix.(V.scale (1. -. a) (V.make 1. 1. 1.) + V.scale a (V.make 0.5 0.7 1.))
 
 let () =
-  let aspect_ratio = 16.0 /. 9.0 in
+  let aspect_ratio = 16. /. 9. in
   let image_width = 400 in
   let image_height =
     max 1 (int_of_float (float_of_int image_width /. aspect_ratio))
   in
 
-  let focal_length = 1.0 in
-  let viewport_height = 2.0 in
+  let focal_length = 1. in
+  let viewport_height = 2. in
   let viewport_width =
     float_of_int image_width /. float_of_int image_height *. viewport_height
   in
