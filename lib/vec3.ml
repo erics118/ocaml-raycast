@@ -43,4 +43,5 @@ module Infix = struct
   let ( + ) = add
   let ( - ) = sub
   let ( * ) k v = scale k v
+  let ( / ) v k = div v k
 end

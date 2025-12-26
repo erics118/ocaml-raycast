@@ -12,6 +12,7 @@ bug-reports: "https://github.com/erics118/ocaml-raycast/issues"
 depends: [
   "dune" {>= "3.20"}
   "ocaml"
+  "core"
   "ppx_deriving"
   "ppx_inline_test"
   "odoc" {with-doc}
