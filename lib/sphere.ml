@@ -27,9 +27,9 @@ let hit (s : t) r interval : Hit_record.t option =
     let r1 = (-.half_b -. sqrtd) /. a in
     let r2 = (-.half_b +. sqrtd) /. a in
     let root =
-      if not (Interval.surrounds interval r1) then
-        if not (Interval.surrounds interval r2) then None else Some r2
-      else Some r1
+      if Interval.surrounds interval r1 then Some r1
+      else if Interval.surrounds interval r2 then Some r2
+      else None
     in
     (* make the hit record *)
     match root with
