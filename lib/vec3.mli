@@ -58,10 +58,6 @@ val to_string : t -> string
 (** generates a random unit vector *)
 val random_unit_vector : unit -> t
 
-(** [random_unit_vector_on_hemisphere normal] generates a random unit vector on the
-  hemisphere defined the normal vector [normal] *)
-val random_unit_vector_on_hemisphere : t -> t
-
 val ( +^ ) : t -> t -> t
 val ( -^ ) : t -> t -> t
 val ( *^ ) : float -> t -> t

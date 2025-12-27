@@ -54,11 +54,6 @@ let random_unit_vector () =
   make x y z
 ;;
 
-let random_unit_vector_on_hemisphere normal =
-  let unit_vector = random_unit_vector () in
-  if dot unit_vector normal > 0.0 then unit_vector else neg unit_vector
-;;
-
 (* infix operators *)
 let ( +^ ) = add
 let ( -^ ) = sub

@@ -75,7 +75,8 @@ let rec ray_color (r : Ray.t) (world : World.t) (depth : int) =
     match World.hit_world world r (Interval.make 0.001 Float.infinity) with
     | Some hr ->
       let n = hr.normal in
-      let direction = V.random_unit_vector_on_hemisphere n in
+      (* randomly generate a vector according to lambertian distribution *)
+      let direction = V.(n +^ V.random_unit_vector ()) in
       let bounced_color = ray_color (Ray.make hr.p direction) world (depth - 1) in
       V.(0.5 *^ bounced_color)
     | None ->
