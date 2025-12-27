@@ -6,13 +6,14 @@ type t =
   ; image_width : int
   ; image_height : int
   ; samples_per_pixel : int
+  ; max_depth : int
   ; center : Vec3.t
   ; pixel00_loc : Vec3.t
   ; pixel_delta_u : Vec3.t
   ; pixel_delta_v : Vec3.t
   }
 
-let make aspect_ratio image_width samples_per_pixel =
+let make ~aspect_ratio ~image_width ~samples_per_pixel ~max_depth =
   let image_height = max 1 (int_of_float (float_of_int image_width /. aspect_ratio)) in
   let focal_length = 1. in
   let viewport_height = 2. in
@@ -34,6 +35,7 @@ let make aspect_ratio image_width samples_per_pixel =
   { aspect_ratio
   ; image_width
   ; image_height
+  ; max_depth
   ; samples_per_pixel
   ; center = camera_center
   ; pixel00_loc
@@ -62,16 +64,22 @@ let get_ray (camera : t) (i : int) (j : int) : Ray.t =
   Ray.make camera.center VInfix.(direction - camera.center)
 ;;
 
-(** [ray_color ray world] computes the color seen along [ray] in [world] *)
-let ray_color (r : Ray.t) (world : World.t) =
-  match World.hit_world world r (Interval.make 0. Float.infinity) with
-  | Some hr ->
-    let n = hr.normal in
-    VInfix.(0.5 * (n + V.make 1. 1. 1.))
-  | None ->
-    let unit_direction = V.normalize (Ray.direction r) in
-    let a = 0.5 *. (V.y unit_direction +. 1.) in
-    VInfix.(((1. -. a) * V.make 1. 1. 1.) + (a * V.make 0.5 0.7 1.))
+(** [ray_color ray world depth] computes the color seen along [ray] in [world] with
+    recursion depth limit [depth] *)
+let rec ray_color (r : Ray.t) (world : World.t) (depth : int) =
+  if depth <= 0
+  then V.zero
+  else (
+    match World.hit_world world r (Interval.make 0.001 Float.infinity) with
+    | Some hr ->
+      let n = hr.normal in
+      let direction = V.random_unit_vector_on_hemisphere n in
+      let bounced_color = ray_color (Ray.make hr.p direction) world (depth - 1) in
+      VInfix.(0.5 * bounced_color)
+    | None ->
+      let unit_direction = V.normalize (Ray.direction r) in
+      let a = 0.5 *. (V.y unit_direction +. 1.) in
+      VInfix.(((1. -. a) * V.make 1. 1. 1.) + (a * V.make 0.5 0.7 1.)))
 ;;
 
 let render camera world =
@@ -81,7 +89,8 @@ let render camera world =
       let pixel_color_sum = ref V.zero in
       for _s = 0 to camera.samples_per_pixel - 1 do
         let ray = get_ray camera i j in
-        pixel_color_sum := VInfix.(!pixel_color_sum + ray_color ray world)
+        let color = ray_color ray world camera.max_depth in
+        pixel_color_sum := VInfix.(!pixel_color_sum + color)
       done;
       let pixel_color =
         VInfix.(!pixel_color_sum / float_of_int camera.samples_per_pixel)

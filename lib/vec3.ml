@@ -44,6 +44,21 @@ let of_tuple (x, y, z) = make x y z
 let to_tuple v = v.x, v.y, v.z
 let to_string v = Printf.sprintf "(%g, %g, %g)" v.x v.y v.z
 
+let random_unit_vector () =
+  let theta = Random.float (2. *. Float.pi) in
+  (* random float between -1 and 1 *)
+  let z = Random.float 2. -. 1. in
+  let r = sqrt (1. -. (z *. z)) in
+  let x = r *. cos theta in
+  let y = r *. sin theta in
+  make x y z
+;;
+
+let random_unit_vector_on_hemisphere normal =
+  let unit_vector = random_unit_vector () in
+  if dot unit_vector normal > 0.0 then unit_vector else neg unit_vector
+;;
+
 (* infix operators *)
 module Infix = struct
   let ( + ) = add

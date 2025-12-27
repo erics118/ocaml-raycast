@@ -17,6 +17,12 @@ let () =
       ; Hittable.Sphere (Sphere.make (V.make 0. (-100.5) (-1.)) 100.)
       ]
   in
-  let camera = Raycast.Camera.make (16. /. 9.) 400 100 in
+  let camera =
+    Raycast.Camera.make
+      ~aspect_ratio:(16. /. 9.)
+      ~image_width:400
+      ~samples_per_pixel:10
+      ~max_depth:10
+  in
   Raycast.Camera.render camera world
 ;;
