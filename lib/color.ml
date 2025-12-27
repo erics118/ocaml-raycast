@@ -7,3 +7,4 @@ let write_color out c =
   and ig = int_of_float (V.y scaled)
   and ib = int_of_float (V.z scaled) in
   Printf.fprintf out "%d %d %d\n" ir ig ib
+;;

@@ -1,4 +1,8 @@
-type t = { x : float; y : float; z : float }
+type t =
+  { x : float
+  ; y : float
+  ; z : float
+  }
 
 (* constructors *)
 let make x y z = { x; y; z }
@@ -24,6 +28,7 @@ let cross a b =
     ((a.y *. b.z) -. (a.z *. b.y))
     ((a.z *. b.x) -. (a.x *. b.z))
     ((a.x *. b.y) -. (a.y *. b.x))
+;;
 
 (* norms *)
 let norm2 v = dot v v
@@ -32,10 +37,11 @@ let norm v = sqrt (norm2 v)
 let normalize v =
   let n = norm v in
   if n = 0. then zero else scale (1. /. n) v
+;;
 
 (* conversions *)
 let of_tuple (x, y, z) = make x y z
-let to_tuple v = (v.x, v.y, v.z)
+let to_tuple v = v.x, v.y, v.z
 let to_string v = Printf.sprintf "(%g, %g, %g)" v.x v.y v.z
 
 (* infix operators *)

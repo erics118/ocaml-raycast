@@ -1,17 +1,17 @@
-type t
 (** interval with min and max bounds *)
+type t
 
-val make : float -> float -> t
 (** creates an interval *)
+val make : float -> float -> t
 
-val min : t -> float
 (** gets the minimum value *)
+val min : t -> float
 
-val max : t -> float
 (** gets the maximum value *)
+val max : t -> float
 
-val size : t -> float
 (** gets the size (max - min) *)
+val size : t -> float
 
-val surrounds : t -> float -> bool
 (** checks if value is within interval *)
+val surrounds : t -> float -> bool

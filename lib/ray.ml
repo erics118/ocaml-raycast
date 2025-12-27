@@ -1,7 +1,10 @@
 module V = Vec3
 open V.Infix
 
-type t = { origin : V.t; direction : V.t }
+type t =
+  { origin : V.t
+  ; direction : V.t
+  }
 
 let make origin direction = { origin; direction }
 let at r t = r.origin + (t * r.direction)

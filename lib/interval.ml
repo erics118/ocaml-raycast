@@ -1,4 +1,7 @@
-type t = { min : float; max : float }
+type t =
+  { min : float
+  ; max : float
+  }
 
 let make min max = { min; max }
 let min i = i.min
