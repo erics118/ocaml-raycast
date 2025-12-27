@@ -15,3 +15,6 @@ val size : t -> float
 
 (** checks if value is within interval *)
 val surrounds : t -> float -> bool
+
+(** clamps a value to be within the interval *)
+val clamp : t -> float -> float

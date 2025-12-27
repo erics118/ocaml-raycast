@@ -35,4 +35,4 @@ setup.log
 # Local OPAM switch
 _opam/
 
-image.ppm
+*.ppm

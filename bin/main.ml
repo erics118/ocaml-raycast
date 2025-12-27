@@ -17,6 +17,6 @@ let () =
       ; Hittable.Sphere (Sphere.make (V.make 0. (-100.5) (-1.)) 100.)
       ]
   in
-  let camera = Raycast.Camera.make (16. /. 9.) 400 in
+  let camera = Raycast.Camera.make (16. /. 9.) 400 100 in
   Raycast.Camera.render camera world
 ;;

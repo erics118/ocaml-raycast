@@ -5,13 +5,14 @@ type t =
   { aspect_ratio : float
   ; image_width : int
   ; image_height : int
+  ; samples_per_pixel : int
   ; center : Vec3.t
   ; pixel00_loc : Vec3.t
   ; pixel_delta_u : Vec3.t
   ; pixel_delta_v : Vec3.t
   }
 
-let make aspect_ratio image_width =
+let make aspect_ratio image_width samples_per_pixel =
   let image_height = max 1 (int_of_float (float_of_int image_width /. aspect_ratio)) in
   let focal_length = 1. in
   let viewport_height = 2. in
@@ -33,11 +34,32 @@ let make aspect_ratio image_width =
   { aspect_ratio
   ; image_width
   ; image_height
+  ; samples_per_pixel
   ; center = camera_center
   ; pixel00_loc
   ; pixel_delta_u
   ; pixel_delta_v
   }
+;;
+
+(** returns a point in the square -0.5 to 0.5 in x and y directions *)
+let sample_square () : Vec3.t =
+  let r1 = Random.float 1. -. 0.5 in
+  let r2 = Random.float 1. -. 0.5 in
+  Vec3.make r1 r2 0.
+;;
+
+(** [get_ray camera i j] constructs a camera ray that is slightly randomized for
+  antialiasing purposes *)
+let get_ray (camera : t) (i : int) (j : int) : Ray.t =
+  let offset = sample_square () in
+  let direction =
+    VInfix.(
+      camera.pixel00_loc
+      + ((float_of_int i +. V.x offset) * camera.pixel_delta_u)
+      + ((float_of_int j +. V.y offset) * camera.pixel_delta_v))
+  in
+  Ray.make camera.center VInfix.(direction - camera.center)
 ;;
 
 (** [ray_color ray world] computes the color seen along [ray] in [world] *)
@@ -56,15 +78,16 @@ let render camera world =
   Printf.printf "P3\n%d %d\n255\n" camera.image_width camera.image_height;
   for j = 0 to camera.image_height - 1 do
     for i = 0 to camera.image_width - 1 do
-      let pixel_center =
-        VInfix.(
-          camera.pixel00_loc
-          + (float_of_int i * camera.pixel_delta_u)
-          + (float_of_int j * camera.pixel_delta_v))
-      in
-      let direction = VInfix.(pixel_center - camera.center) in
-      let ray = Ray.make camera.center direction in
-      Color.write_color stdout (ray_color ray world)
+      let pixel_color = ref (V.make 0. 0. 0.) in
+      for s = 0 to camera.samples_per_pixel - 1 do
+        let ray = get_ray camera i j in
+        let sample_color = ray_color ray world in
+        VInfix.(pixel_color := !pixel_color + sample_color)
+      done
+      [@warning "-35"];
+      Color.write_color
+        stdout
+        VInfix.(!pixel_color / float_of_int camera.samples_per_pixel)
     done
   done
 ;;
