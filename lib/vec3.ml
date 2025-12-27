@@ -60,9 +60,7 @@ let random_unit_vector_on_hemisphere normal =
 ;;
 
 (* infix operators *)
-module Infix = struct
-  let ( + ) = add
-  let ( - ) = sub
-  let ( * ) k v = scale k v
-  let ( / ) v k = div v k
-end
+let ( +^ ) = add
+let ( -^ ) = sub
+let ( *^ ) k v = scale k v
+let ( /^ ) v k = div v k

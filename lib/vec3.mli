@@ -62,9 +62,7 @@ val random_unit_vector : unit -> t
   hemisphere defined the normal vector [normal] *)
 val random_unit_vector_on_hemisphere : t -> t
 
-module Infix : sig
-  val ( + ) : t -> t -> t
-  val ( - ) : t -> t -> t
-  val ( * ) : float -> t -> t
-  val ( / ) : t -> float -> t
-end
+val ( +^ ) : t -> t -> t
+val ( -^ ) : t -> t -> t
+val ( *^ ) : float -> t -> t
+val ( /^ ) : t -> float -> t

@@ -1,7 +1,6 @@
 open Core
 module V = Raycast.Vec3
 module R = Raycast.Ray
-module VInfix = V.Infix
 module World = Raycast.World
 module Sphere = Raycast.Sphere
 module Hittable = Raycast.Hittable

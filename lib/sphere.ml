@@ -1,5 +1,4 @@
 module V = Vec3
-module VInfix = Vec3.Infix
 module R = Ray
 
 type t =
@@ -9,13 +8,8 @@ type t =
 
 let make center radius = { center; radius }
 
-(* let hit_sphere center radius r = let oc = VInfix.(R.origin r - center) in let a =
-   V.norm2 (R.direction r) in let h = V.dot oc (R.direction r) in let c = V.norm2 oc -.
-   (radius *. radius) in let discriminant = (h *. h) -. (a *. c) in if Float.(discriminant
-   < 0.) then -1. else (h -. sqrt discriminant) /. a *)
-
 let hit (s : t) r interval : Hit_record.t option =
-  let oc = VInfix.(R.origin r - s.center) in
+  let oc = V.(R.origin r -^ s.center) in
   let a = V.norm2 (R.direction r) in
   let half_b = V.dot oc (R.direction r) in
   let c = V.norm2 oc -. (s.radius *. s.radius) in
@@ -39,7 +33,7 @@ let hit (s : t) r interval : Hit_record.t option =
     | None -> None
     | Some root ->
       let p = R.at r root in
-      let outward_normal = VInfix.((p - s.center) / s.radius) in
+      let outward_normal = V.((p -^ s.center) /^ s.radius) in
       let is_front_face = V.dot (R.direction r) outward_normal < 0. in
       Some
         { Hit_record.p
