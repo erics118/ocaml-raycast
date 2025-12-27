@@ -31,14 +31,14 @@ let%test "vec3_norm" =
 ;;
 
 let%test "ray_make" =
-  let origin = V.make 0. 0. 0. in
+  let origin = V.zero in
   let direction = V.make 1. 0. 0. in
   let r = R.make origin direction in
   Float.(V.x (R.origin r) = 0. && V.x (R.direction r) = 1.)
 ;;
 
 let%test "ray_at" =
-  let origin = V.make 0. 0. 0. in
+  let origin = V.zero in
   let direction = V.make 1. 0. 0. in
   let r = R.make origin direction in
   let point = R.at r 2. in

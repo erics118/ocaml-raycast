@@ -1,8 +1,9 @@
 module V = Vec3
 
+let color_range = Interval.make 0. 1.
+
 let component_to_intensity component =
-  let interval = Interval.make 0. 1. in
-  int_of_float (255.999 *. Interval.clamp interval component)
+  int_of_float (255.999 *. Interval.clamp color_range component)
 ;;
 
 let write_color out c =
