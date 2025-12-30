@@ -6,9 +6,11 @@ let component_to_intensity component =
   int_of_float (255.999 *. Interval.clamp color_range component)
 ;;
 
+let linear_to_gamma component = if component > 0. then sqrt component else 0.
+
 let write_color out c =
-  let ir = component_to_intensity (V.x c)
-  and ig = component_to_intensity (V.y c)
-  and ib = component_to_intensity (V.z c) in
+  let ir = c |> V.x |> linear_to_gamma |> component_to_intensity in
+  let ig = c |> V.y |> linear_to_gamma |> component_to_intensity in
+  let ib = c |> V.z |> linear_to_gamma |> component_to_intensity in
   Printf.fprintf out "%d %d %d\n" ir ig ib
 ;;
