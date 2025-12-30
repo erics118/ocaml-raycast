@@ -1,4 +1,4 @@
-type t = { objects : Hittable.hittable list }
+type t = { objects : Hittable.t list }
 
 let make objects = { objects }
 
