@@ -8,7 +8,7 @@ type t =
 
 let make center radius = { center; radius }
 
-let hit (s : t) r interval : Hit_record.t option =
+let hit s r interval =
   let oc = V.(R.origin r -^ s.center) in
   let a = V.norm2 (R.direction r) in
   let half_b = V.dot oc (R.direction r) in

@@ -7,8 +7,9 @@ type t =
 (** creates a sphere *)
 val make : Vec3.t -> float -> t
 
-(** test if a ray hits this sphere within the given interval *)
+(** [hit sphere ray interval] tests if a ray hits this sphere within the given interval *)
 val hit : t -> Ray.t -> Interval.t -> Hit_record.t option
 
-(** convert sphere to a hittable with the given material *)
+(** [to_hittable sphere material] converts a sphere to a hittable with the given material
+  *)
 val to_hittable : t -> Material.t -> Hittable.t

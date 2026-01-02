@@ -47,7 +47,7 @@ let make ~aspect_ratio ~image_width ~samples_per_pixel ~max_depth =
 ;;
 
 (** returns a point in the square -0.5 to 0.5 in x and y directions *)
-let sample_square () : Vec3.t =
+let sample_square () =
   let r1 = Random.float 1. -. 0.5 in
   let r2 = Random.float 1. -. 0.5 in
   Vec3.make r1 r2 0.
@@ -55,7 +55,7 @@ let sample_square () : Vec3.t =
 
 (** [get_ray camera i j] constructs a camera ray that is slightly randomized for
   antialiasing purposes *)
-let get_ray (camera : t) (i : int) (j : int) : Ray.t =
+let get_ray camera i j =
   let offset = sample_square () in
   let direction =
     V.(
@@ -68,7 +68,7 @@ let get_ray (camera : t) (i : int) (j : int) : Ray.t =
 
 (** [ray_color ray world depth] computes the color seen along [ray] in [world] with
     recursion depth limit [depth] *)
-let rec ray_color (r : Ray.t) (world : World.t) (depth : int) =
+let rec ray_color r world depth =
   if depth <= 0
   then V.zero
   else (

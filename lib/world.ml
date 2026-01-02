@@ -2,7 +2,7 @@ type t = { objects : Hittable.t list }
 
 let make objects = { objects }
 
-let hit_world (world : t) ray interval : (Hit_record.t * Material.t) option =
+let hit_world world ray interval =
   let rec aux objs closest_so_far acc =
     match objs with
     | [] -> acc

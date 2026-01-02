@@ -46,7 +46,7 @@ val norm2 : t -> float
 (** gets the length of the vector *)
 val norm : t -> float
 
-(** normalizes the vector to unit length *)
+(** returns the vector normalized to unit length *)
 val normalize : t -> t
 
 (** creates a vector from tuple *)
