@@ -43,4 +43,11 @@ let hit (s : t) r interval : Hit_record.t option =
         })
 ;;
 
-let to_hittable s = { Hittable.hit = (fun ray interval -> hit s ray interval) }
+let to_hittable s mat =
+  { Hittable.hit =
+      (fun ray interval ->
+        match hit s ray interval with
+        | Some hr -> Some (hr, mat)
+        | None -> None)
+  }
+;;

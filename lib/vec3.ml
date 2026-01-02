@@ -17,6 +17,7 @@ let z v = v.z
 let neg v = make (-.v.x) (-.v.y) (-.v.z)
 let add a b = make (a.x +. b.x) (a.y +. b.y) (a.z +. b.z)
 let sub a b = make (a.x -. b.x) (a.y -. b.y) (a.z -. b.z)
+let mul a b = make (a.x *. b.x) (a.y *. b.y) (a.z *. b.z)
 let scale k v = make (k *. v.x) (k *. v.y) (k *. v.z)
 let div v k = make (v.x /. k) (v.y /. k) (v.z /. k)
 
@@ -54,8 +55,16 @@ let random_unit_vector () =
   make x y z
 ;;
 
+let near_zero v =
+  let s = 1e-8 in
+  abs_float v.x < s && abs_float v.y < s && abs_float v.z < s
+;;
+
+let reflect v n = sub v (scale (2. *. dot v n) n)
+
 (* infix operators *)
 let ( +^ ) = add
 let ( -^ ) = sub
 let ( *^ ) k v = scale k v
+let ( **^ ) = mul
 let ( /^ ) v k = div v k

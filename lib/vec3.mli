@@ -25,6 +25,9 @@ val add : t -> t -> t
 (** subtracts two vectors *)
 val sub : t -> t -> t
 
+(** component-wise multiplication (Hadamard product) *)
+val mul : t -> t -> t
+
 (** scales the vector by a float *)
 val scale : float -> t -> t
 
@@ -58,7 +61,14 @@ val to_string : t -> string
 (** generates a random unit vector *)
 val random_unit_vector : unit -> t
 
+(** checks if the vector is close to zero in all dimensions *)
+val near_zero : t -> bool
+
+(** [reflect v n] reflects vector [v] around normal vector [n] *)
+val reflect : t -> t -> t
+
 val ( +^ ) : t -> t -> t
 val ( -^ ) : t -> t -> t
 val ( *^ ) : float -> t -> t
+val ( **^ ) : t -> t -> t
 val ( /^ ) : t -> float -> t

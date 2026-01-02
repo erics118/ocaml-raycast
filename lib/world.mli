@@ -5,4 +5,4 @@ type t
 val make : Hittable.t list -> t
 
 (** finds the closest hit in the world within the interval *)
-val hit_world : t -> Ray.t -> Interval.t -> Hit_record.t option
+val hit_world : t -> Ray.t -> Interval.t -> (Hit_record.t * Material.t) option

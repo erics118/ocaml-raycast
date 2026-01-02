@@ -10,5 +10,5 @@ val make : Vec3.t -> float -> t
 (** test if a ray hits this sphere within the given interval *)
 val hit : t -> Ray.t -> Interval.t -> Hit_record.t option
 
-(** convert sphere to a hittable for use in world *)
-val to_hittable : t -> Hittable.t
+(** convert sphere to a hittable with the given material *)
+val to_hittable : t -> Material.t -> Hittable.t

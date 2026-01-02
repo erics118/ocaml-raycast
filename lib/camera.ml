@@ -73,12 +73,11 @@ let rec ray_color (r : Ray.t) (world : World.t) (depth : int) =
   then V.zero
   else (
     match World.hit_world world r (Interval.make 0.001 Float.infinity) with
-    | Some hr ->
-      let n = hr.normal in
-      (* randomly generate a vector according to lambertian distribution *)
-      let direction = V.(n +^ V.random_unit_vector ()) in
-      let bounced_color = ray_color (Ray.make hr.p direction) world (depth - 1) in
-      V.(0.5 *^ bounced_color)
+    | Some (hr, mat) ->
+      (match mat.Material.scatter r hr with
+       | Some (attenuation, scattered) ->
+         V.(attenuation **^ ray_color scattered world (depth - 1))
+       | None -> V.zero)
     | None ->
       let unit_direction = V.normalize (Ray.direction r) in
       let a = 0.5 *. (V.y unit_direction +. 1.) in
