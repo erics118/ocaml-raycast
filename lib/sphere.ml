@@ -42,3 +42,5 @@ let hit (s : t) r interval : Hit_record.t option =
         ; front_face = is_front_face
         })
 ;;
+
+let to_hittable s = { Hittable.hit = (fun ray interval -> hit s ray interval) }
