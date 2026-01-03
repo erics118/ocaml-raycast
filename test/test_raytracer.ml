@@ -1,7 +1,7 @@
 open Core
-module V = Raycast.Vec3
-module R = Raycast.Ray
-module C = Raycast.Color
+module V = Raytracer.Vec3
+module R = Raytracer.Ray
+module C = Raytracer.Color
 
 (* basic tests *)
 

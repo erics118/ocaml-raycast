@@ -1,11 +1,11 @@
 (lang dune 3.20)
 
-(name raycast)
+(name raytracer)
 
 (generate_opam_files true)
 
 (source
- (github erics118/ocaml-raycast))
+ (github erics118/ocaml-raytracer))
 
 (authors "erics118")
 
@@ -13,10 +13,10 @@
 
 (license LICENSE)
 
-(documentation https://github.com/erics118/ocaml-raycast)
+(documentation https://github.com/erics118/ocaml-raytracer)
 
 (package
- (name raycast)
+ (name raytracer)
  (synopsis "A short synopsis")
  (description "A longer description")
  (depends ocaml core ppx_deriving ppx_inline_test)

@@ -1,12 +1,13 @@
 open Core
-module V = Raycast.Vec3
-module R = Raycast.Ray
-module World = Raycast.World
-module Sphere = Raycast.Sphere
-module Material = Raycast.Material
-module Hittable = Raycast.Hittable
-module Hit_record = Raycast.Hit_record
-module Interval = Raycast.Interval
+module V = Raytracer.Vec3
+module R = Raytracer.Ray
+module Camera = Raytracer.Camera
+module World = Raytracer.World
+module Sphere = Raytracer.Sphere
+module Material = Raytracer.Material
+module Hittable = Raytracer.Hittable
+module Hit_record = Raytracer.Hit_record
+module Interval = Raytracer.Interval
 
 let () =
   let mat_ground = Material.make_lambertian (V.make 0.8 0.8 0.0) in
@@ -22,11 +23,11 @@ let () =
       ]
   in
   let camera =
-    Raycast.Camera.make
+    Camera.make
       ~aspect_ratio:(16. /. 9.)
-      ~image_width:400
+      ~image_width:6400
       ~samples_per_pixel:10
       ~max_depth:10
   in
-  Raycast.Camera.render camera world
+  Camera.render camera world
 ;;
