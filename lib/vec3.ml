@@ -21,6 +21,13 @@ let mul a b = make (a.x *. b.x) (a.y *. b.y) (a.z *. b.z)
 let scale k v = make (k *. v.x) (k *. v.y) (k *. v.z)
 let div v k = make (v.x /. k) (v.y /. k) (v.z /. k)
 
+(* infix operators *)
+let ( +^ ) = add
+let ( -^ ) = sub
+let ( *^ ) k v = scale k v
+let ( **^ ) = mul
+let ( /^ ) v k = div v k
+
 (* dot, cross *)
 let dot a b = (a.x *. b.x) +. (a.y *. b.y) +. (a.z *. b.z)
 
@@ -37,7 +44,7 @@ let norm v = sqrt (norm2 v)
 
 let normalize v =
   let n = norm v in
-  if n = 0. then zero else scale (1. /. n) v
+  if n = 0. then zero else 1. /. n *^ v
 ;;
 
 (* conversions *)
@@ -57,21 +64,14 @@ let random_unit_vector () =
 
 let near_zero v =
   let s = 1e-8 in
-  abs_float v.x < s && abs_float v.y < s && abs_float v.z < s
+  Float.abs v.x < s && Float.abs v.y < s && Float.abs v.z < s
 ;;
 
-let reflect v n = sub v (scale (2. *. dot v n) n)
+let reflect v n = sub v (2. *. dot v n *^ n)
 
 let refract uv n etai_over_etat =
   let cos_theta = Float.min (dot (neg uv) n) 1. in
-  let r_out_perp = scale etai_over_etat (add uv (scale cos_theta n)) in
-  let r_out_parallel = scale (-.Float.sqrt (abs_float (1. -. norm2 r_out_perp))) n in
+  let r_out_perp = etai_over_etat *^ (uv +^ (cos_theta *^ n)) in
+  let r_out_parallel = -.Float.sqrt (Float.abs (1. -. norm2 r_out_perp)) *^ n in
   add r_out_perp r_out_parallel
 ;;
-
-(* infix operators *)
-let ( +^ ) = add
-let ( -^ ) = sub
-let ( *^ ) k v = scale k v
-let ( **^ ) = mul
-let ( /^ ) v k = div v k

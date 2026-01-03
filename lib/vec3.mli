@@ -28,6 +28,13 @@ val sub : t -> t -> t
 (** component-wise multiplication (Hadamard product) *)
 val mul : t -> t -> t
 
+(* infix operators *)
+val ( +^ ) : t -> t -> t
+val ( -^ ) : t -> t -> t
+val ( *^ ) : float -> t -> t
+val ( **^ ) : t -> t -> t
+val ( /^ ) : t -> float -> t
+
 (** scales the vector by a float *)
 val scale : float -> t -> t
 
@@ -70,9 +77,3 @@ val reflect : t -> t -> t
 (** [refract uv n etai_over_etat] refracts vector [uv] with normal [n] and ratio of
   indices of refraction [etai_over_etat] *)
 val refract : t -> t -> float -> t
-
-val ( +^ ) : t -> t -> t
-val ( -^ ) : t -> t -> t
-val ( *^ ) : float -> t -> t
-val ( **^ ) : t -> t -> t
-val ( /^ ) : t -> float -> t
