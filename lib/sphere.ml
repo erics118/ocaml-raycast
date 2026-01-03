@@ -51,3 +51,5 @@ let to_hittable s mat =
         | None -> None)
   }
 ;;
+
+let make_hittable center radius mat = to_hittable (make center radius) mat

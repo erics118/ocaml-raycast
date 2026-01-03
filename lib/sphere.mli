@@ -13,3 +13,5 @@ val hit : t -> Ray.t -> Interval.t -> Hit_record.t option
 (** [to_hittable sphere material] converts a sphere to a hittable with the given material
   *)
 val to_hittable : t -> Material.t -> Hittable.t
+
+val make_hittable : Vec3.t -> float -> Material.t -> Hittable.t
