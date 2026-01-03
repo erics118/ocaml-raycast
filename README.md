@@ -2,4 +2,7 @@
 
 raytracer in ocaml.
 
-based off of [Ray Tracing in One Weekend](https://raytracing.github.io/books/RayTracingInOneWeekend.html)
+based off of [_Ray Tracing in One Weekend_](https://raytracing.github.io/books/RayTracingInOneWeekend.html)
+
+
+![example output](image.png)
