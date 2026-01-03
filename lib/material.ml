@@ -26,3 +26,26 @@ let make_metal albedo fuzz =
         else None)
   }
 ;;
+
+let make_dielectric refractive_index =
+  let reflectance cos_theta ref_idx =
+    (* using Schlick's approximation for reflectance. *)
+    let r0 = ((1. -. ref_idx) /. (1. +. ref_idx)) ** 2. in
+    r0 +. ((1. -. r0) *. ((1. -. cos_theta) ** 5.))
+  in
+  { scatter =
+      (fun r_in hr ->
+        let attenuation = Vec3.make 1. 1. 1. in
+        let ri = if hr.front_face then 1.0 /. refractive_index else refractive_index in
+        let unit_direction = Vec3.normalize (Ray.direction r_in) in
+        let cos_theta = Float.min (Vec3.dot (Vec3.neg unit_direction) hr.normal) 1. in
+        let sin_theta = Float.sqrt (1. -. (cos_theta *. cos_theta)) in
+        let direction =
+          if ri *. sin_theta > 1.0 || reflectance cos_theta ri > Random.float 1.
+          then Vec3.reflect unit_direction hr.normal
+          else Vec3.refract unit_direction hr.normal ri
+        in
+        let scattered = Ray.make hr.p direction in
+        Some (attenuation, scattered))
+  }
+;;

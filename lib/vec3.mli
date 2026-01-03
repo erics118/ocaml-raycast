@@ -67,6 +67,10 @@ val near_zero : t -> bool
 (** [reflect v n] reflects vector [v] around normal vector [n] *)
 val reflect : t -> t -> t
 
+(** [refract uv n etai_over_etat] refracts vector [uv] with normal [n] and ratio of
+  indices of refraction [etai_over_etat] *)
+val refract : t -> t -> float -> t
+
 val ( +^ ) : t -> t -> t
 val ( -^ ) : t -> t -> t
 val ( *^ ) : float -> t -> t

@@ -9,3 +9,6 @@ val make_lambertian : Vec3.t -> t
 
 (** [make_metal albedo fuzz] creates a metal material with the given albedo color and fuzziness *)
 val make_metal : Vec3.t -> float -> t
+
+(** [make_dielectric refractive_index] creates a dielectric material with the given refractive index *)
+val make_dielectric : float -> t

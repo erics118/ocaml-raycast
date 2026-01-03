@@ -62,6 +62,13 @@ let near_zero v =
 
 let reflect v n = sub v (scale (2. *. dot v n) n)
 
+let refract uv n etai_over_etat =
+  let cos_theta = Float.min (dot (neg uv) n) 1. in
+  let r_out_perp = scale etai_over_etat (add uv (scale cos_theta n)) in
+  let r_out_parallel = scale (-.Float.sqrt (abs_float (1. -. norm2 r_out_perp))) n in
+  add r_out_perp r_out_parallel
+;;
+
 (* infix operators *)
 let ( +^ ) = add
 let ( -^ ) = sub
