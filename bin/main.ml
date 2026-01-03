@@ -3,31 +3,43 @@ module Vec3 = Raytracer.Vec3
 module Camera = Raytracer.Camera
 module World = Raytracer.World
 module Sphere = Raytracer.Sphere
+module Plane = Raytracer.Plane
 module Material = Raytracer.Material
 
-let _basic_world =
-  let material_ground = Material.make_lambertian (Vec3.make 0.8 0.8 0.0) in
-  let material_center = Material.make_lambertian (Vec3.make 0.1 0.2 0.5) in
-  let material_left = Material.make_dielectric 1.5 in
-  let material_bubble = Material.make_dielectric (1.0 /. 1.5) in
-  let material_right = Material.make_metal (Vec3.make 0.8 0.6 0.2) 0.0 in
-  World.make
-    [ Sphere.make_hittable (Vec3.make 0. (-100.5) (-1.)) 100. material_ground
-    ; Sphere.make_hittable (Vec3.make 0. 0. (-1.2)) 0.5 material_center
-    ; Sphere.make_hittable (Vec3.make (-1.) 0. (-1.)) 0.5 material_left
-    ; Sphere.make_hittable (Vec3.make (-1.) 0. (-1.)) 0.4 material_bubble
-    ; Sphere.make_hittable (Vec3.make 1. 0. (-1.)) 0.5 material_right
-    ]
-;;
-
-let _wide_world =
-  let r = Float.cos (Float.pi /. 4.) in
-  let material_left = Material.make_lambertian (Vec3.make 0. 0. 1.) in
-  let material_right = Material.make_lambertian (Vec3.make 1. 0. 0.) in
-  World.make
-    [ Sphere.make_hittable (Vec3.make (-.r) 0. (-1.)) r material_left
-    ; Sphere.make_hittable (Vec3.make r 0. (-1.)) r material_right
-    ]
+let basic_world () =
+  let objects = ref [] in
+  let add obj = objects := obj :: !objects in
+  let add_sphere center radius mat =
+    add (Sphere.make_hittable center radius mat)
+  in
+  let add_plane center normal w l mat =
+    add (Plane.make_hittable center normal w l mat)
+  in
+  let green = Material.make_lambertian (Vec3.make 0.0 0.8 0.0) in
+  let blue = Material.make_lambertian (Vec3.make 0.1 0.2 0.5) in
+  let red = Material.make_lambertian (Vec3.make 0.8 0.1 0.0) in
+  let glass = Material.make_dielectric 2. in
+  let metal = Material.make_metal (Vec3.make 0.8 0.6 0.2) 0.0 in
+  (* for i = -3 to 3 do
+    for j = -3 to 3 do
+      for k = -3 to 3 do
+        let center =
+          Vec3.make
+            ((Float.of_int i *. 2.) +. Random.float 1.)
+            ((Float.of_int j *. 2.) +. Random.float 1.)
+            ((Float.of_int k *. 2.) +. Random.float 1.)
+        in
+        add_sphere center 1.5 blue
+      done
+    done
+  done; *)
+  add_sphere (Vec3.make (-1.) 7. (-4.)) 3. red;
+  add_sphere (Vec3.make (-3.) 3. 3.) 5. metal;
+  add_sphere (Vec3.make 3. 0. (-5.)) 4. glass;
+  add_sphere (Vec3.make 3. 1. 0.) 2. red;
+  add_sphere (Vec3.make 4. 3. 6.) 2. blue;
+  add_plane Vec3.zero (Vec3.make 0. 1. 0.) 20. 20. green;
+  World.make !objects
 ;;
 
 let random_color () =
@@ -42,7 +54,7 @@ let random_color_range lo hi =
     (lo +. Random.float range)
 ;;
 
-let final_world =
+let _final_world () =
   let spheres = ref [] in
   let add_sphere m c r = spheres := Sphere.make_hittable c r m :: !spheres in
   (* ground *)
@@ -89,14 +101,14 @@ let () =
       ~aspect_ratio:(16. /. 9.)
       ~image_width:1600
       ~samples_per_pixel:10
-      ~max_depth:10
-      ~vfov:20.
-      ~lookfrom:(Vec3.make 13. 2. 3.)
+      ~max_depth:50
+      ~vfov:50.
+      ~lookfrom:(Vec3.make 25. 25. 6.)
       ~lookat:(Vec3.make 0. 0. 0.)
       ~vup:(Vec3.make 0. 1. 0.)
-      ~defocus_angle:0.6
-      ~focus_dist:10.0
+      (* ~defocus_angle:0.6 *)
+      (* ~focus_dist:10.0 *)
       ()
   in
-  Camera.render camera final_world
+  Camera.render camera (basic_world ())
 ;;
