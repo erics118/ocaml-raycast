@@ -1,2 +1,6 @@
 profile = janestreet
 version = 0.28.1
+doc-comments = before
+wrap-comments = true
+margin-check = true
+margin = 80

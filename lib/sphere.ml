@@ -1,6 +1,3 @@
-module V = Vec3
-module R = Ray
-
 type t =
   { center : Vec3.t
   ; radius : float
@@ -9,10 +6,10 @@ type t =
 let make center radius = { center; radius }
 
 let hit s r interval =
-  let oc = V.(R.origin r -^ s.center) in
-  let a = V.norm2 (R.direction r) in
-  let half_b = V.dot oc (R.direction r) in
-  let c = V.norm2 oc -. (s.radius *. s.radius) in
+  let oc = Vec3.(Ray.origin r -^ s.center) in
+  let a = Vec3.norm2 (Ray.direction r) in
+  let half_b = Vec3.dot oc (Ray.direction r) in
+  let c = Vec3.norm2 oc -. (s.radius *. s.radius) in
   let discriminant = (half_b *. half_b) -. (a *. c) in
   if discriminant < 0.0
   then None
@@ -32,12 +29,13 @@ let hit s r interval =
     match root with
     | None -> None
     | Some root ->
-      let p = R.at r root in
-      let outward_normal = V.((p -^ s.center) /^ s.radius) in
-      let is_front_face = V.dot (R.direction r) outward_normal < 0. in
+      let p = Ray.at r root in
+      let outward_normal = Vec3.((p -^ s.center) /^ s.radius) in
+      let is_front_face = Vec3.dot (Ray.direction r) outward_normal < 0. in
       Some
         { Hit_record.p
-        ; normal = (if is_front_face then outward_normal else V.neg outward_normal)
+        ; normal =
+            (if is_front_face then outward_normal else Vec3.neg outward_normal)
         ; t = root
         ; front_face = is_front_face
         })

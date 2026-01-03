@@ -6,7 +6,9 @@ let make_lambertian albedo =
         let scatter_direction = Vec3.(hr.normal +^ random_unit_vector ()) in
         (* catch degenerate scatter direction *)
         let scatter_direction =
-          if Vec3.near_zero scatter_direction then hr.normal else scatter_direction
+          if Vec3.near_zero scatter_direction
+          then hr.normal
+          else scatter_direction
         in
         let scattered = Ray.make hr.p scatter_direction in
         Some (albedo, scattered))
@@ -19,7 +21,9 @@ let make_metal albedo fuzz =
   { scatter =
       (fun r_in hr ->
         let reflected = Vec3.reflect (Ray.direction r_in) hr.normal in
-        let reflected = Vec3.(normalize reflected +^ (fuzz *^ random_unit_vector ())) in
+        let reflected =
+          Vec3.(normalize reflected +^ (fuzz *^ random_unit_vector ()))
+        in
         let scattered = Ray.make hr.p reflected in
         if Vec3.dot (Ray.direction scattered) hr.normal > 0.
         then Some (albedo, scattered)
@@ -36,9 +40,13 @@ let make_dielectric refractive_index =
   { scatter =
       (fun r_in hr ->
         let attenuation = Vec3.make 1. 1. 1. in
-        let ri = if hr.front_face then 1.0 /. refractive_index else refractive_index in
+        let ri =
+          if hr.front_face then 1.0 /. refractive_index else refractive_index
+        in
         let unit_direction = Vec3.normalize (Ray.direction r_in) in
-        let cos_theta = Float.min (Vec3.dot (Vec3.neg unit_direction) hr.normal) 1. in
+        let cos_theta =
+          Float.min (Vec3.dot (Vec3.neg unit_direction) hr.normal) 1.
+        in
         let sin_theta = Float.sqrt (1. -. (cos_theta *. cos_theta)) in
         let direction =
           if ri *. sin_theta > 1.0 || reflectance cos_theta ri > Random.float 1.

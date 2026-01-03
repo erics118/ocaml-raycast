@@ -1,5 +1,3 @@
-module V = Vec3
-
 type t =
   { aspect_ratio : float
   ; image_width : int
@@ -38,28 +36,36 @@ let make
       ?(focus_dist = 10.)
       ()
   =
-  let image_height = max 1 (int_of_float (float_of_int image_width /. aspect_ratio)) in
+  let image_height =
+    max 1 (int_of_float (float_of_int image_width /. aspect_ratio))
+  in
   let theta = degrees_to_radians vfov in
   let h = tan (theta /. 2.) in
   let viewport_height = 2. *. h *. focus_dist in
   let viewport_width =
     float_of_int image_width /. float_of_int image_height *. viewport_height
   in
-  let w = V.normalize V.(lookfrom -^ lookat) in
-  let u = V.normalize (V.cross vup w) in
-  let v = V.cross w u in
+  let w = Vec3.normalize Vec3.(lookfrom -^ lookat) in
+  let u = Vec3.normalize (Vec3.cross vup w) in
+  let v = Vec3.cross w u in
   let camera_center = lookfrom in
-  let viewport_u = V.(viewport_width *^ u) in
-  let viewport_v = V.(-.viewport_height *^ v) in
-  let pixel_delta_u = V.(viewport_u /^ float_of_int image_width) in
-  let pixel_delta_v = V.(viewport_v /^ float_of_int image_height) in
+  let viewport_u = Vec3.(viewport_width *^ u) in
+  let viewport_v = Vec3.(-.viewport_height *^ v) in
+  let pixel_delta_u = Vec3.(viewport_u /^ float_of_int image_width) in
+  let pixel_delta_v = Vec3.(viewport_v /^ float_of_int image_height) in
   let viewport_upper_left =
-    V.(camera_center -^ (focus_dist *^ w) -^ (viewport_u /^ 2.) -^ (viewport_v /^ 2.))
+    Vec3.(
+      camera_center
+      -^ (focus_dist *^ w)
+      -^ (viewport_u /^ 2.)
+      -^ (viewport_v /^ 2.))
   in
   let pixel00_loc =
-    V.(viewport_upper_left +^ (pixel_delta_u /^ 2.) +^ (pixel_delta_v /^ 2.))
+    Vec3.(viewport_upper_left +^ (pixel_delta_u /^ 2.) +^ (pixel_delta_v /^ 2.))
   in
-  let defocus_radius = focus_dist *. tan (degrees_to_radians (defocus_angle /. 2.)) in
+  let defocus_radius =
+    focus_dist *. tan (degrees_to_radians (defocus_angle /. 2.))
+  in
   { aspect_ratio
   ; image_width
   ; image_height
@@ -78,8 +84,8 @@ let make
   ; u
   ; v
   ; w
-  ; defocus_disk_u = V.(defocus_radius *^ u)
-  ; defocus_disk_v = V.(defocus_radius *^ v)
+  ; defocus_disk_u = Vec3.(defocus_radius *^ u)
+  ; defocus_disk_v = Vec3.(defocus_radius *^ v)
   }
 ;;
 
@@ -92,15 +98,18 @@ let sample_square () =
 
 let random_in_unit_disk () =
   let rec aux () =
-    let p = V.make (Random.float 2. -. 1.) (Random.float 2. -. 1.) 0. in
-    if V.dot p p >= 1. then aux () else p
+    let p = Vec3.make (Random.float 2. -. 1.) (Random.float 2. -. 1.) 0. in
+    if Vec3.dot p p >= 1. then aux () else p
   in
   aux ()
 ;;
 
 let defocus_disk_sample (camera : t) =
   let p = random_in_unit_disk () in
-  V.(camera.center +^ (x p *^ camera.defocus_disk_u) +^ (y p *^ camera.defocus_disk_v))
+  Vec3.(
+    camera.center
+    +^ (x p *^ camera.defocus_disk_u)
+    +^ (y p *^ camera.defocus_disk_v))
 ;;
 
 (** [get_ray camera i j] constructs a camera ray that is slightly randomized for
@@ -108,47 +117,51 @@ let defocus_disk_sample (camera : t) =
 let get_ray camera i j =
   let offset = sample_square () in
   let pixel_sample =
-    V.(
+    Vec3.(
       camera.pixel00_loc
-      +^ ((float_of_int i +. V.x offset) *^ camera.pixel_delta_u)
-      +^ ((float_of_int j +. V.y offset) *^ camera.pixel_delta_v))
+      +^ ((float_of_int i +. Vec3.x offset) *^ camera.pixel_delta_u)
+      +^ ((float_of_int j +. Vec3.y offset) *^ camera.pixel_delta_v))
   in
   let ray_origin =
-    if camera.defocus_angle <= 0. then camera.center else defocus_disk_sample camera
+    if camera.defocus_angle <= 0.
+    then camera.center
+    else defocus_disk_sample camera
   in
-  let ray_direction = V.(pixel_sample -^ ray_origin) in
+  let ray_direction = Vec3.(pixel_sample -^ ray_origin) in
   Ray.make ray_origin ray_direction
 ;;
 
-(** [ray_color ray world depth] computes the color seen along [ray] in [world] with
-    recursion depth limit [depth] *)
+(** [ray_color ray world depth] computes the color seen along [ray] in [world]
+ * with recursion depth limit [depth] *)
 let rec ray_color r world depth =
   if depth <= 0
-  then V.zero
+  then Vec3.zero
   else (
     match World.hit_world world r (Interval.make 0.001 Float.infinity) with
     | Some (hr, mat) ->
       (match mat.Material.scatter r hr with
        | Some (attenuation, scattered) ->
-         V.(attenuation **^ ray_color scattered world (depth - 1))
-       | None -> V.zero)
+         Vec3.(attenuation **^ ray_color scattered world (depth - 1))
+       | None -> Vec3.zero)
     | None ->
-      let unit_direction = V.normalize (Ray.direction r) in
-      let a = 0.5 *. (V.y unit_direction +. 1.) in
-      V.(((1. -. a) *^ V.make 1. 1. 1.) +^ (a *^ V.make 0.5 0.7 1.)))
+      let unit_direction = Vec3.normalize (Ray.direction r) in
+      let a = 0.5 *. (Vec3.y unit_direction +. 1.) in
+      Vec3.(((1. -. a) *^ Vec3.make 1. 1. 1.) +^ (a *^ Vec3.make 0.5 0.7 1.)))
 ;;
 
 let render camera world =
   Printf.printf "P3\n%d %d\n255\n" camera.image_width camera.image_height;
   for j = 0 to camera.image_height - 1 do
     for i = 0 to camera.image_width - 1 do
-      let pixel_color_sum = ref V.zero in
+      let pixel_color_sum = ref Vec3.zero in
       for _s = 0 to camera.samples_per_pixel - 1 do
         let ray = get_ray camera i j in
         let color = ray_color ray world camera.max_depth in
-        pixel_color_sum := V.(!pixel_color_sum +^ color)
+        pixel_color_sum := Vec3.(!pixel_color_sum +^ color)
       done;
-      let pixel_color = V.(!pixel_color_sum /^ float_of_int camera.samples_per_pixel) in
+      let pixel_color =
+        Vec3.(!pixel_color_sum /^ float_of_int camera.samples_per_pixel)
+      in
       Color.write_color stdout pixel_color
     done
   done
