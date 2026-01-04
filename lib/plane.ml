@@ -51,14 +51,36 @@ let hit plane r interval =
           })))
 ;;
 
+let bounding_box plane =
+  let half_w = plane.width /. 2. in
+  let half_l = plane.length /. 2. in
+  let pad = 1e-4 in
+  let n_pad = Vec3.(pad *^ plane.normal) in
+  let corners =
+    [ Vec3.(plane.center +^ (half_w *^ plane.u) +^ (half_l *^ plane.v))
+    ; Vec3.(plane.center +^ (half_w *^ plane.u) -^ (half_l *^ plane.v))
+    ; Vec3.(plane.center -^ (half_w *^ plane.u) +^ (half_l *^ plane.v))
+    ; Vec3.(plane.center -^ (half_w *^ plane.u) -^ (half_l *^ plane.v))
+    ]
+  in
+  (* include a tiny thickness along normal to avoid zero-volume box *)
+  let pts = List.concat_map (fun c -> [ Vec3.(c +^ n_pad); Vec3.(c -^ n_pad) ]) corners in
+  match pts with
+  | [] -> Aabb.empty
+  | p :: rest ->
+    List.fold_left
+      (fun acc q -> Aabb.surrounding_box acc (Aabb.of_points p q))
+      (Aabb.of_points p p)
+      rest
+;;
+
 let to_hittable plane mat =
   { Hittable.hit =
       (fun ray interval ->
         match hit plane ray interval with
         | Some hr -> Some (hr, mat)
         | None -> None)
-      (* TODO *)
-  ; bounding_box = Aabb.empty
+  ; bounding_box = bounding_box plane
   }
 ;;
 
