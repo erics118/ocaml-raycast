@@ -7,3 +7,6 @@ val make : Hittable.t list -> t
 (** [hit_world world ray interval] hits the closest hit in the world within the interval
   *)
 val hit_world : t -> Ray.t -> Interval.t -> (Hit_record.t * Material.t) option
+
+(** returns the bounding box containing all objects in the world *)
+val bounding_box : t -> Aabb.t

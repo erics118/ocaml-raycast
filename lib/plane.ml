@@ -57,6 +57,8 @@ let to_hittable plane mat =
         match hit plane ray interval with
         | Some hr -> Some (hr, mat)
         | None -> None)
+      (* TODO *)
+  ; bounding_box = Aabb.empty
   }
 ;;
 

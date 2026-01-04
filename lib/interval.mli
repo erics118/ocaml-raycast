@@ -4,6 +4,9 @@ type t
 (** creates an interval *)
 val make : float -> float -> t
 
+(** empty interval (+infinity, -infinity) *)
+val empty : t
+
 (** gets the minimum value *)
 val min : t -> float
 
@@ -22,3 +25,5 @@ val clamp : t -> float -> float
 (** [expand delta] expands the interval by a given amount. ie, by [delta /. 2.]
   on the left and [delta /. 2.] on the right *)
 val expand : t -> float -> t
+
+val surrounding_interval : t -> t -> t

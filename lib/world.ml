@@ -1,6 +1,19 @@
-type t = { objects : Hittable.t list }
+type t =
+  { objects : Hittable.t list
+  ; bbox : Aabb.t
+  }
 
-let make objects = { objects }
+let make objects =
+  let bbox =
+    List.fold_left
+      (fun acc obj -> Aabb.surrounding_box acc obj.Hittable.bounding_box)
+      Aabb.empty
+      objects
+  in
+  { objects; bbox }
+;;
+
+let bounding_box world = world.bbox
 
 let hit_world world ray interval =
   let rec aux objs closest_so_far acc =

@@ -46,11 +46,26 @@ let hit s r interval =
         })
 ;;
 
+(** compute the bounding box for a sphere.
+    For moving spheres, returns a box that contains the sphere at all times 0-1. *)
+let bounding_box s =
+  let r_vec = Vec3.make s.radius s.radius s.radius in
+  (* box at time 0 *)
+  let center0 = Ray.origin s.center in
+  let box0 = Aabb.of_points Vec3.(center0 -^ r_vec) Vec3.(center0 +^ r_vec) in
+  (* box at time 1 *)
+  let center1 = Ray.at s.center 1.0 in
+  let box1 = Aabb.of_points Vec3.(center1 -^ r_vec) Vec3.(center1 +^ r_vec) in
+  (* union of both boxes *)
+  Aabb.surrounding_box box0 box1
+;;
+
 let to_hittable s mat =
   { Hittable.hit =
       (fun ray interval ->
         match hit s ray interval with
         | Some hr -> Some (hr, mat)
         | None -> None)
+  ; bounding_box = bounding_box s
   }
 ;;

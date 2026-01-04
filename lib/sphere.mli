@@ -15,6 +15,10 @@ val make_moving : Vec3.t -> Vec3.t -> float -> t
   interval *)
 val hit : t -> Ray.t -> Interval.t -> Hit_record.t option
 
+(** compute the bounding box for a sphere.
+    For moving spheres, returns a box that contains the sphere at all times 0-1. *)
+val bounding_box : t -> Aabb.t
+
 (** [to_hittable sphere material] converts a sphere to a hittable with the given
   material *)
 val to_hittable : t -> Material.t -> Hittable.t
