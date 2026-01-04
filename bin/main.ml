@@ -9,9 +9,7 @@ module Material = Raytracer.Material
 let basic_world () =
   let objects = ref [] in
   let add obj = objects := obj :: !objects in
-  let add_sphere center radius mat =
-    add (Sphere.make_hittable center radius mat)
-  in
+  let add_sphere s mat = add (Sphere.to_hittable s mat) in
   let add_plane center normal w l mat =
     add (Plane.make_hittable center normal w l mat)
   in
@@ -20,26 +18,26 @@ let basic_world () =
   let red = Material.make_lambertian (Vec3.make 0.8 0.1 0.0) in
   let glass = Material.make_dielectric 2. in
   let metal = Material.make_metal (Vec3.make 0.8 0.6 0.2) 0.0 in
-  (* for i = -3 to 3 do
-    for j = -3 to 3 do
-      for k = -3 to 3 do
-        let center =
-          Vec3.make
-            ((Float.of_int i *. 2.) +. Random.float 1.)
-            ((Float.of_int j *. 2.) +. Random.float 1.)
-            ((Float.of_int k *. 2.) +. Random.float 1.)
-        in
-        add_sphere center 1.5 blue
-      done
-    done
-  done; *)
-  add_sphere (Vec3.make (-1.) 7. (-4.)) 3. red;
-  add_sphere (Vec3.make (-3.) 3. 3.) 5. metal;
-  add_sphere (Vec3.make 3. 0. (-5.)) 4. glass;
-  add_sphere (Vec3.make 3. 1. 0.) 2. red;
-  add_sphere (Vec3.make 4. 3. 6.) 2. blue;
+  add_sphere (Sphere.make (Vec3.make (-1.) 7. (-4.)) 3.) red;
+  add_sphere (Sphere.make (Vec3.make (-3.) 3. 3.) 5.) metal;
+  add_sphere (Sphere.make (Vec3.make 3. 0. (-5.)) 4.) glass;
+  add_sphere (Sphere.make (Vec3.make 3. 1. 0.) 2.) red;
+  add_sphere (Sphere.make (Vec3.make 4. 3. 6.) 2.) blue;
   add_plane Vec3.zero (Vec3.make 0. 1. 0.) 20. 20. green;
-  World.make !objects
+  let world = World.make !objects in
+  let camera =
+    Camera.make
+      ~aspect_ratio:(16. /. 9.)
+      ~image_width:1600
+      ~samples_per_pixel:20
+      ~max_depth:50
+      ~vfov:50.
+      ~lookfrom:(Vec3.make 25. 25. 6.)
+      ~lookat:(Vec3.make 0. 0. 0.)
+      ~vup:(Vec3.make 0. 1. 0.)
+      ()
+  in
+  Camera.render camera world
 ;;
 
 let random_color () =
@@ -54,12 +52,12 @@ let random_color_range lo hi =
     (lo +. Random.float range)
 ;;
 
-let _final_world () =
+let final_world () =
   let spheres = ref [] in
-  let add_sphere m c r = spheres := Sphere.make_hittable c r m :: !spheres in
+  let add m s = spheres := Sphere.to_hittable s m :: !spheres in
   (* ground *)
   let ground_material = Material.make_lambertian (Vec3.make 0.5 0.5 0.5) in
-  add_sphere ground_material (Vec3.make 0. (-1000.) 0.) 1000.;
+  add ground_material (Sphere.make (Vec3.make 0. (-1000.) 0.) 1000.);
   (* random small spheres *)
   for a = -11 to 10 do
     for b = -11 to 10 do
@@ -71,6 +69,7 @@ let _final_world () =
       in
       if Float.(Vec3.norm Vec3.(center -^ Vec3.make 4. 0.2 0.) > 0.9)
       then (
+        let center2 = Vec3.(center +^ Vec3.make 0. (Random.float 0.5) 0.) in
         let sphere_material =
           match Random.float 1. with
           | x when Float.(x < 0.8) ->
@@ -82,33 +81,37 @@ let _final_world () =
             Material.make_metal albedo fuzz
           | _ -> Material.make_dielectric 1.5
         in
-        add_sphere sphere_material center 0.2)
+        add sphere_material (Sphere.make_moving center center2 0.2))
     done
   done;
   (* three large spheres *)
   let material1 = Material.make_dielectric 1.5 in
   let material2 = Material.make_lambertian (Vec3.make 0.4 0.2 0.1) in
   let material3 = Material.make_metal (Vec3.make 0.7 0.6 0.5) 0.0 in
-  add_sphere material1 (Vec3.make 0. 1. 0.) 1.0;
-  add_sphere material2 (Vec3.make (-4.) 1. 0.) 1.0;
-  add_sphere material3 (Vec3.make 4. 1. 0.) 1.0;
-  World.make !spheres
-;;
-
-let () =
+  add material1 (Sphere.make (Vec3.make 0. 1. 0.) 1.0);
+  add material2 (Sphere.make (Vec3.make (-4.) 1. 0.) 1.0);
+  add material3 (Sphere.make (Vec3.make 4. 1. 0.) 1.0);
+  let world = World.make !spheres in
   let camera =
     Camera.make
       ~aspect_ratio:(16. /. 9.)
-      ~image_width:1600
-      ~samples_per_pixel:10
+      ~image_width:400
+      ~samples_per_pixel:5
       ~max_depth:50
       ~vfov:50.
-      ~lookfrom:(Vec3.make 25. 25. 6.)
+      ~lookfrom:(Vec3.make 13. 2. 3.)
       ~lookat:(Vec3.make 0. 0. 0.)
       ~vup:(Vec3.make 0. 1. 0.)
-      (* ~defocus_angle:0.6 *)
-      (* ~focus_dist:10.0 *)
+      ~defocus_angle:0.6
+      ~focus_dist:10.0
       ()
   in
-  Camera.render camera (basic_world ())
+  Camera.render camera world
+;;
+
+let () =
+  match 0 with
+  | 0 -> basic_world ()
+  | 1 -> final_world ()
+  | _ -> failwith "invalid world selection"
 ;;

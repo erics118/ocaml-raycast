@@ -2,7 +2,7 @@ type t = { scatter : Ray.t -> Hit_record.t -> (Vec3.t * Ray.t) option }
 
 let make_lambertian albedo =
   { scatter =
-      (fun _r_in hr ->
+      (fun r_in hr ->
         let scatter_direction = Vec3.(hr.normal +^ random_unit_vector ()) in
         (* catch degenerate scatter direction *)
         let scatter_direction =
@@ -10,7 +10,7 @@ let make_lambertian albedo =
           then hr.normal
           else scatter_direction
         in
-        let scattered = Ray.make hr.p scatter_direction in
+        let scattered = Ray.make ~time:(Ray.time r_in) hr.p scatter_direction in
         Some (albedo, scattered))
   }
 ;;
@@ -24,7 +24,7 @@ let make_metal albedo fuzz =
         let reflected =
           Vec3.(normalize reflected +^ (fuzz *^ random_unit_vector ()))
         in
-        let scattered = Ray.make hr.p reflected in
+        let scattered = Ray.make ~time:(Ray.time r_in) hr.p reflected in
         if Vec3.dot (Ray.direction scattered) hr.normal > 0.
         then Some (albedo, scattered)
         else None)
@@ -53,7 +53,7 @@ let make_dielectric refractive_index =
           then Vec3.reflect unit_direction hr.normal
           else Vec3.refract unit_direction hr.normal ri
         in
-        let scattered = Ray.make hr.p direction in
+        let scattered = Ray.make ~time:(Ray.time r_in) hr.p direction in
         Some (attenuation, scattered))
   }
 ;;

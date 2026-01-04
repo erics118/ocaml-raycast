@@ -65,6 +65,9 @@ val to_tuple : t -> float * float * float
 (** converts the vector to string *)
 val to_string : t -> string
 
+(** converts the vector to list *)
+val to_list : t -> float list
+
 (** generates a random unit vector *)
 val random_unit_vector : unit -> t
 

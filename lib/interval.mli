@@ -18,3 +18,7 @@ val surrounds : t -> float -> bool
 
 (** clamps a value to be within the interval *)
 val clamp : t -> float -> float
+
+(** [expand delta] expands the interval by a given amount. ie, by [delta /. 2.]
+  on the left and [delta /. 2.] on the right *)
+val expand : t -> float -> t

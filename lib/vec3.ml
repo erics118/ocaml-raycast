@@ -51,7 +51,9 @@ let normalize v =
 let of_tuple (x, y, z) = make x y z
 let to_tuple v = v.x, v.y, v.z
 let to_string v = Printf.sprintf "(%g, %g, %g)" v.x v.y v.z
+let to_list v = [ v.x; v.y; v.z ]
 
+(* random vectors *)
 let random_unit_vector () =
   let theta = Random.float (2. *. Float.pi) in
   (* random float between -1 and 1 *)

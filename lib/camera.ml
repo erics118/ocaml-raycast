@@ -128,7 +128,8 @@ let get_ray camera i j =
     else defocus_disk_sample camera
   in
   let ray_direction = Vec3.(pixel_sample -^ ray_origin) in
-  Ray.make ray_origin ray_direction
+  let time = Random.float 1. in
+  Ray.make ~time ray_origin ray_direction
 ;;
 
 (** [ray_color ray world depth] computes the color seen along [ray] in [world]
@@ -144,9 +145,8 @@ let rec ray_color r world depth =
          Vec3.(attenuation **^ ray_color scattered world (depth - 1))
        | None -> Vec3.zero)
     | None ->
-      let unit_direction = Vec3.normalize (Ray.direction r) in
-      let a = 0.5 *. (Vec3.y unit_direction +. 1.) in
-      Vec3.(((1. -. a) *^ Vec3.make 1. 1. 1.) +^ (a *^ Vec3.make 0.5 0.7 1.)))
+      (* background color *)
+      Vec3.make 1. 1. 1.)
 ;;
 
 let render camera world =

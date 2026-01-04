@@ -1,12 +1,17 @@
 type t =
-  { center : Vec3.t
+  { center : Ray.t
   ; radius : float
   }
 
-let make center radius = { center; radius }
+let make center radius = { center = Ray.make center Vec3.zero; radius }
+
+let make_moving center center2 radius =
+  { center = Ray.make center Vec3.(center2 -^ center); radius }
+;;
 
 let hit s r interval =
-  let oc = Vec3.(Ray.origin r -^ s.center) in
+  let current_center = Ray.at s.center (Ray.time r) in
+  let oc = Vec3.(Ray.origin r -^ current_center) in
   let a = Vec3.norm2 (Ray.direction r) in
   let half_b = Vec3.dot oc (Ray.direction r) in
   let c = Vec3.norm2 oc -. (s.radius *. s.radius) in
@@ -30,7 +35,7 @@ let hit s r interval =
     | None -> None
     | Some root ->
       let p = Ray.at r root in
-      let outward_normal = Vec3.((p -^ s.center) /^ s.radius) in
+      let outward_normal = Vec3.((p -^ current_center) /^ s.radius) in
       let is_front_face = Vec3.dot (Ray.direction r) outward_normal < 0. in
       Some
         { Hit_record.p
@@ -49,5 +54,3 @@ let to_hittable s mat =
         | None -> None)
   }
 ;;
-
-let make_hittable center radius mat = to_hittable (make center radius) mat
