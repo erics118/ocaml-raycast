@@ -4,9 +4,8 @@ type t =
   }
 
 let make min max = { min; max }
-
 let empty = { min = Float.infinity; max = Float.neg_infinity }
-
+let universe = { min = Float.neg_infinity; max = Float.infinity }
 let min i = i.min
 let max i = i.max
 let size i = i.max -. i.min

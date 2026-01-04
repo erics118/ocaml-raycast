@@ -5,6 +5,7 @@ module World = Raytracer.World
 module Sphere = Raytracer.Sphere
 module Plane = Raytracer.Plane
 module Material = Raytracer.Material
+module Bvh = Raytracer.Bvh
 
 let basic_world () =
   let objects = ref [] in
@@ -91,7 +92,9 @@ let final_world () =
   add material1 (Sphere.make (Vec3.make 0. 1. 0.) 1.0);
   add material2 (Sphere.make (Vec3.make (-4.) 1. 0.) 1.0);
   add material3 (Sphere.make (Vec3.make 4. 1. 0.) 1.0);
-  let world = World.make !spheres in
+  (* wrap all objects in a BVH for accelerated intersection testing *)
+  let bvh_hittable = Bvh.make !spheres in
+  let world = World.make [ bvh_hittable ] in
   let camera =
     Camera.make
       ~aspect_ratio:(16. /. 9.)

@@ -10,8 +10,8 @@ let x aabb = aabb.x
 let y aabb = aabb.y
 let z aabb = aabb.z
 let make x y z = { x; y; z }
-
 let empty = make Interval.empty Interval.empty Interval.empty
+let universe = make Interval.universe Interval.universe Interval.universe
 
 let of_points a b =
   let min_x = Float.min (Vec3.x a) (Vec3.x b) in
@@ -64,4 +64,18 @@ let hit aabb r ray_t =
       axes
   in
   Option.is_some result
+;;
+
+let longest_axis aabb =
+  let sx = Interval.size aabb.x in
+  let sy = Interval.size aabb.y in
+  let sz = Interval.size aabb.z in
+  if sx > sy then if sx > sz then 0 else 2 else if sy > sz then 1 else 2
+;;
+
+let axis_interval aabb i =
+  match i with
+  | 0 -> aabb.x
+  | 1 -> aabb.y
+  | _ -> aabb.z
 ;;

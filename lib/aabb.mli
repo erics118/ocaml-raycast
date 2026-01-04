@@ -11,8 +11,11 @@ val y : t -> Interval.t
 (** gets the z-axis interval *)
 val z : t -> Interval.t
 
-(** creates an empty aabb *)
+(** an empty aabb (+inf, -inf on all axes) *)
 val empty : t
+
+(** a universe aabb (-inf, +inf on all axes) *)
+val universe : t
 
 (** creates an aabb from given axis intervals *)
 val make : Interval.t -> Interval.t -> Interval.t -> t
@@ -28,3 +31,9 @@ val surrounding_box : t -> t -> t
 
 (** tests if a ray hits the aabb within the given interval *)
 val hit : t -> Ray.t -> Interval.t -> bool
+
+(** gets the index of the longest axis: 0=x, 1=y, 2=z *)
+val longest_axis : t -> int
+
+(** gets the interval for the given axis index (0=x, 1=y, 2=z) *)
+val axis_interval : t -> int -> Interval.t

@@ -7,6 +7,9 @@ val make : float -> float -> t
 (** empty interval (+infinity, -infinity) *)
 val empty : t
 
+(** universe interval (-infinity, +infinity) *)
+val universe : t
+
 (** gets the minimum value *)
 val min : t -> float
 
