@@ -46,13 +46,13 @@ let hit aabb r ray_t =
          match acc with
          | None -> None (* Already failed on a previous axis *)
          | Some (tmin, tmax) ->
+           (* protect against division by near-zero values*)
            let eps = 1e-12 in
            if Float.abs dir < eps
-           then (
-             (* Ray parallel to slab: miss if origin outside interval *)
+           then
              if orig < Interval.min ax || orig > Interval.max ax
              then None
-             else Some (tmin, tmax))
+             else Some (tmin, tmax)
            else (
              let adinv = 1.0 /. dir in
              (* time when the ray enters the slab *)
@@ -82,6 +82,7 @@ let longest_axis aabb =
 ;;
 
 let axis_interval aabb i =
+  (* convenience accessor for BVH axis-sorting *)
   match i with
   | 0 -> aabb.x
   | 1 -> aabb.y

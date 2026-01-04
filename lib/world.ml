@@ -3,14 +3,11 @@ type t =
   ; bbox : Aabb.t
   }
 
-let make objects =
-  let bbox =
-    List.fold_left
-      (fun acc obj -> Aabb.surrounding_box acc obj.Hittable.bounding_box)
-      Aabb.empty
-      objects
-  in
-  { objects; bbox }
+let make = function
+  | [] -> { objects = []; bbox = Aabb.empty }
+  | _ as objects ->
+    let bvh = Bvh.make objects in
+    { objects = [ bvh ]; bbox = bvh.bounding_box }
 ;;
 
 let bounding_box world = world.bbox

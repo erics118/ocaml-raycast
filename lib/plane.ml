@@ -52,10 +52,12 @@ let hit plane r interval =
 ;;
 
 let bounding_box plane =
+  (* plane needs a non-zero volume, so we add a tiny thickness along the normal
+     axis *)
+  let thickness = 1e-4 in
   let half_w = plane.width /. 2. in
   let half_l = plane.length /. 2. in
-  let pad = 1e-4 in
-  let n_pad = Vec3.(pad *^ plane.normal) in
+  let n_pad = Vec3.(thickness *^ plane.normal) in
   let corners =
     [ Vec3.(plane.center +^ (half_w *^ plane.u) +^ (half_l *^ plane.v))
     ; Vec3.(plane.center +^ (half_w *^ plane.u) -^ (half_l *^ plane.v))
@@ -64,7 +66,9 @@ let bounding_box plane =
     ]
   in
   (* include a tiny thickness along normal to avoid zero-volume box *)
-  let pts = List.concat_map (fun c -> [ Vec3.(c +^ n_pad); Vec3.(c -^ n_pad) ]) corners in
+  let pts =
+    List.concat_map (fun c -> [ Vec3.(c +^ n_pad); Vec3.(c -^ n_pad) ]) corners
+  in
   match pts with
   | [] -> Aabb.empty
   | p :: rest ->
