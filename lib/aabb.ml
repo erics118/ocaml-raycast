@@ -46,20 +46,28 @@ let hit aabb r ray_t =
          match acc with
          | None -> None (* Already failed on a previous axis *)
          | Some (tmin, tmax) ->
-           let adinv = 1.0 /. dir in
-           (* time when the ray enters the slab *)
-           let t0 = (Interval.min ax -. orig) *. adinv in
-           (* time when the ray exits the slab *)
-           let t1 = (Interval.max ax -. orig) *. adinv in
-           (* if direction is negative, adinv is negative, so t0 > t1. we need
-              t0 to be entry time (smaller) and t1 to be exit time (larger) *)
-           let tmin, tmax =
-             if t0 < t1
-             then Float.max tmin t0, Float.min tmax t1
-             else Float.max tmin t1, Float.min tmax t0
-           in
-           (* if range is now empty or inverted, ray misses the box *)
-           if tmax <= tmin then None else Some (tmin, tmax))
+           let eps = 1e-12 in
+           if Float.abs dir < eps
+           then (
+             (* Ray parallel to slab: miss if origin outside interval *)
+             if orig < Interval.min ax || orig > Interval.max ax
+             then None
+             else Some (tmin, tmax))
+           else (
+             let adinv = 1.0 /. dir in
+             (* time when the ray enters the slab *)
+             let t0 = (Interval.min ax -. orig) *. adinv in
+             (* time when the ray exits the slab *)
+             let t1 = (Interval.max ax -. orig) *. adinv in
+             (* if direction is negative, adinv is negative, so t0 > t1. we need
+                t0 to be entry time (smaller) and t1 to be exit time (larger) *)
+             let tmin, tmax =
+               if t0 < t1
+               then Float.max tmin t0, Float.min tmax t1
+               else Float.max tmin t1, Float.min tmax t0
+             in
+             (* if range is now empty or inverted, ray misses the box *)
+             if tmax <= tmin then None else Some (tmin, tmax)))
       (Some (Interval.min ray_t, Interval.max ray_t))
       axes
   in
