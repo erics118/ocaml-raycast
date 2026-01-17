@@ -37,13 +37,13 @@ let make
       ()
   =
   let image_height =
-    max 1 (int_of_float (float_of_int image_width /. aspect_ratio))
+    Int.max 1 (Int.of_float (Float.of_int image_width /. aspect_ratio))
   in
   let theta = degrees_to_radians vfov in
-  let h = tan (theta /. 2.) in
+  let h = Float.tan (theta /. 2.) in
   let viewport_height = 2. *. h *. focus_dist in
   let viewport_width =
-    float_of_int image_width /. float_of_int image_height *. viewport_height
+    Float.of_int image_width /. Float.of_int image_height *. viewport_height
   in
   let w = Vec3.normalize Vec3.(lookfrom -^ lookat) in
   let u = Vec3.normalize (Vec3.cross vup w) in
@@ -51,8 +51,8 @@ let make
   let camera_center = lookfrom in
   let viewport_u = Vec3.(viewport_width *^ u) in
   let viewport_v = Vec3.(-.viewport_height *^ v) in
-  let pixel_delta_u = Vec3.(viewport_u /^ float_of_int image_width) in
-  let pixel_delta_v = Vec3.(viewport_v /^ float_of_int image_height) in
+  let pixel_delta_u = Vec3.(viewport_u /^ Float.of_int image_width) in
+  let pixel_delta_v = Vec3.(viewport_v /^ Float.of_int image_height) in
   let viewport_upper_left =
     Vec3.(
       camera_center
@@ -64,7 +64,7 @@ let make
     Vec3.(viewport_upper_left +^ (pixel_delta_u /^ 2.) +^ (pixel_delta_v /^ 2.))
   in
   let defocus_radius =
-    focus_dist *. tan (degrees_to_radians (defocus_angle /. 2.))
+    focus_dist *. Float.tan (degrees_to_radians (defocus_angle /. 2.))
   in
   { aspect_ratio
   ; image_width
@@ -99,7 +99,7 @@ let sample_square () =
 let random_in_unit_disk () =
   let rec aux () =
     let p = Vec3.make (Random.float 2. -. 1.) (Random.float 2. -. 1.) 0. in
-    if Vec3.dot p p >= 1. then aux () else p
+    if Float.(Vec3.dot p p >= 1.) then aux () else p
   in
   aux ()
 ;;
@@ -119,11 +119,11 @@ let get_ray camera i j =
   let pixel_sample =
     Vec3.(
       camera.pixel00_loc
-      +^ ((float_of_int i +. Vec3.x offset) *^ camera.pixel_delta_u)
-      +^ ((float_of_int j +. Vec3.y offset) *^ camera.pixel_delta_v))
+      +^ ((Float.of_int i +. Vec3.x offset) *^ camera.pixel_delta_u)
+      +^ ((Float.of_int j +. Vec3.y offset) *^ camera.pixel_delta_v))
   in
   let ray_origin =
-    if camera.defocus_angle <= 0.
+    if Float.(camera.defocus_angle <= 0.)
     then camera.center
     else defocus_disk_sample camera
   in
@@ -150,7 +150,7 @@ let rec ray_color r world depth =
 ;;
 
 let render camera world =
-  Printf.printf "P3\n%d %d\n255\n" camera.image_width camera.image_height;
+  printf "P3\n%d %d\n255\n" camera.image_width camera.image_height;
   for j = 0 to camera.image_height - 1 do
     for i = 0 to camera.image_width - 1 do
       let pixel_color_sum = ref Vec3.zero in
@@ -160,9 +160,9 @@ let render camera world =
         pixel_color_sum := Vec3.(!pixel_color_sum +^ color)
       done;
       let pixel_color =
-        Vec3.(!pixel_color_sum /^ float_of_int camera.samples_per_pixel)
+        Vec3.(!pixel_color_sum /^ Float.of_int camera.samples_per_pixel)
       in
-      Color.write_color stdout pixel_color
+      Color.write_color Out_channel.stdout pixel_color
     done
   done
 ;;

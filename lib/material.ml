@@ -25,7 +25,7 @@ let make_metal albedo fuzz =
           Vec3.(normalize reflected +^ (fuzz *^ random_unit_vector ()))
         in
         let scattered = Ray.make ~time:(Ray.time r_in) hr.p reflected in
-        if Vec3.dot (Ray.direction scattered) hr.normal > 0.
+        if Float.(Vec3.dot (Ray.direction scattered) hr.normal > 0.)
         then Some (albedo, scattered)
         else None)
   }
@@ -49,7 +49,10 @@ let make_dielectric refractive_index =
         in
         let sin_theta = Float.sqrt (1. -. (cos_theta *. cos_theta)) in
         let direction =
-          if ri *. sin_theta > 1.0 || reflectance cos_theta ri > Random.float 1.
+          if
+            Float.(
+              ri *. sin_theta > 1.0
+              || reflectance cos_theta ri > Random.float 1.)
           then Vec3.reflect unit_direction hr.normal
           else Vec3.refract unit_direction hr.normal ri
         in

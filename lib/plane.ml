@@ -11,7 +11,7 @@ let make center normal width length =
   let n = Vec3.normalize normal in
   (* compute local axes u and v perpendicular to normal *)
   let arbitrary =
-    if Float.abs (Vec3.y n) < 0.9
+    if Float.(Float.abs (Vec3.y n) < 0.9)
     then Vec3.make 0. 1. 0.
     else Vec3.make 1. 0. 0.
   in
@@ -23,7 +23,7 @@ let make center normal width length =
 let hit plane r interval =
   let denom = Vec3.dot plane.normal (Ray.direction r) in
   (* if denom is ~0, ray is parallel to plane *)
-  if Float.abs denom < 1e-8
+  if Float.(Float.abs denom < 1e-8)
   then None
   else (
     let t = Vec3.(dot (plane.center -^ Ray.origin r) plane.normal) /. denom in
@@ -38,10 +38,10 @@ let hit plane r interval =
       (* check if within bounds *)
       let half_w = plane.width /. 2. in
       let half_l = plane.length /. 2. in
-      if Float.abs u_coord > half_w || Float.abs v_coord > half_l
+      if Float.(Float.abs u_coord > half_w || Float.abs v_coord > half_l)
       then None
       else (
-        let is_front_face = denom < 0. in
+        let is_front_face = Float.(denom < 0.) in
         Some
           { Hit_record.p
           ; normal =
@@ -67,15 +67,14 @@ let bounding_box plane =
   in
   (* include a tiny thickness along normal to avoid zero-volume box *)
   let pts =
-    List.concat_map (fun c -> [ Vec3.(c +^ n_pad); Vec3.(c -^ n_pad) ]) corners
+    List.concat_map corners ~f:(fun c ->
+      [ Vec3.(c +^ n_pad); Vec3.(c -^ n_pad) ])
   in
   match pts with
   | [] -> Aabb.empty
   | p :: rest ->
-    List.fold_left
-      (fun acc q -> Aabb.surrounding_box acc (Aabb.of_points p q))
-      (Aabb.of_points p p)
-      rest
+    List.fold rest ~init:(Aabb.of_points p p) ~f:(fun acc q ->
+      Aabb.surrounding_box acc (Aabb.of_points p q))
 ;;
 
 let to_hittable plane mat =

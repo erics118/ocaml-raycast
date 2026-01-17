@@ -1,3 +1,5 @@
 (library
  (name raytracer)
- (libraries core))
+ (libraries core)
+ (flags
+  (:standard -open Core)))

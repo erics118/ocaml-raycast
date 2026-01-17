@@ -1,4 +1,3 @@
-open Core
 module Vec3 = Raytracer.Vec3
 module Camera = Raytracer.Camera
 module World = Raytracer.World

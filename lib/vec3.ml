@@ -40,11 +40,11 @@ let cross a b =
 
 (* norms *)
 let norm2 v = dot v v
-let norm v = sqrt (norm2 v)
+let norm v = Float.sqrt (norm2 v)
 
 let normalize v =
   let n = norm v in
-  if n = 0. then zero else 1. /. n *^ v
+  if Float.(n = 0.) then zero else 1. /. n *^ v
 ;;
 
 (* conversions *)
@@ -58,15 +58,15 @@ let random_unit_vector () =
   let theta = Random.float (2. *. Float.pi) in
   (* random float between -1 and 1 *)
   let z = Random.float 2. -. 1. in
-  let r = sqrt (1. -. (z *. z)) in
-  let x = r *. cos theta in
-  let y = r *. sin theta in
+  let r = Float.sqrt (1. -. (z *. z)) in
+  let x = r *. Float.cos theta in
+  let y = r *. Float.sin theta in
   make x y z
 ;;
 
 let near_zero v =
   let s = 1e-8 in
-  Float.abs v.x < s && Float.abs v.y < s && Float.abs v.z < s
+  Float.(Float.abs v.x < s && Float.abs v.y < s && Float.abs v.z < s)
 ;;
 
 let reflect v n = sub v (2. *. dot v n *^ n)

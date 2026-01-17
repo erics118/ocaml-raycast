@@ -1,4 +1,3 @@
-open Core
 module Vec3 = Raytracer.Vec3
 module Ray = Raytracer.Ray
 

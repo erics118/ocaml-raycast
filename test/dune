@@ -1,6 +1,8 @@
 (library
  (name test_raytracer)
  (libraries raytracer core)
+ (flags
+  (:standard -open Core))
  (inline_tests)
  (preprocess
   (pps ppx_inline_test)))

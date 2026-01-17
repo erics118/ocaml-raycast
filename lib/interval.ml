@@ -9,7 +9,7 @@ let universe = { min = Float.neg_infinity; max = Float.infinity }
 let min i = i.min
 let max i = i.max
 let size i = i.max -. i.min
-let surrounds i x = x >= i.min && x <= i.max
+let surrounds i x = Float.(x >= i.min && x <= i.max)
 let clamp i x = Float.max i.min (Float.min i.max x)
 
 let expand i delta =
