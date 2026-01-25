@@ -1,6 +1,4 @@
 (executable
  (public_name raytracer)
  (name main)
- (libraries raytracer core)
- (flags
-  (:standard -open Core)))
+ (libraries raytracer core))

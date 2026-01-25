@@ -22,19 +22,21 @@ let rec build objects =
   else (
     (* compute bounding box of all objects *)
     let bbox =
-      Array.fold objects ~init:Aabb.empty ~f:(fun acc obj ->
-        Aabb.surrounding_box acc obj.Hittable.bounding_box)
+      Array.fold_left
+        (fun acc obj -> Aabb.surrounding_box acc obj.Hittable.bounding_box)
+        Aabb.empty
+        objects
     in
     (* choose axis to split along (longest axis) *)
     let axis = Aabb.longest_axis bbox in
     (* comparator function for sorting along the chosen axis *)
     let comparator = box_compare axis in
     (* sort objects along the chosen axis *)
-    Array.sort objects ~compare:comparator;
+    Array.sort comparator objects;
     (* split in the middle *)
     let mid = n / 2 in
-    let left_objs = Array.sub objects ~pos:0 ~len:mid in
-    let right_objs = Array.sub objects ~pos:mid ~len:(n - mid) in
+    let left_objs = Array.sub objects 0 mid in
+    let right_objs = Array.sub objects mid (n - mid) in
     let left = build left_objs in
     let right = build right_objs in
     Node { left; right; bbox })

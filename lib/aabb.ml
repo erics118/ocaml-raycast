@@ -39,37 +39,37 @@ let hit aabb r ray_t =
   let origins = Vec3.to_list (Ray.origin r) in
   let directions = Vec3.to_list (Ray.direction r) in
   (* zip together: [(x_interval, x_origin, x_direction); (y_...); (z_...)] *)
-  let axes = List.zip_exn (List.zip_exn (to_list aabb) origins) directions in
+  let axes = List.combine (List.combine (to_list aabb) origins) directions in
   let result =
-    List.fold
+    List.fold_left
+      (fun acc ((ax, orig), dir) ->
+         match acc with
+         | None -> None (* Already failed on a previous axis *)
+         | Some (tmin, tmax) ->
+           (* protect against division by near-zero values*)
+           let eps = 1e-12 in
+           if Float.abs dir < eps
+           then
+             if orig < Interval.min ax || orig > Interval.max ax
+             then None
+             else Some (tmin, tmax)
+           else (
+             let adinv = 1.0 /. dir in
+             (* time when the ray enters the slab *)
+             let t0 = (Interval.min ax -. orig) *. adinv in
+             (* time when the ray exits the slab *)
+             let t1 = (Interval.max ax -. orig) *. adinv in
+             (* if direction is negative, adinv is negative, so t0 > t1. we need
+                t0 to be entry time (smaller) and t1 to be exit time (larger) *)
+             let tmin, tmax =
+               if t0 < t1
+               then Float.max tmin t0, Float.min tmax t1
+               else Float.max tmin t1, Float.min tmax t0
+             in
+             (* if range is now empty or inverted, ray misses the box *)
+             if tmax <= tmin then None else Some (tmin, tmax)))
+      (Some (Interval.min ray_t, Interval.max ray_t))
       axes
-      ~init:(Some (Interval.min ray_t, Interval.max ray_t))
-      ~f:(fun acc ((ax, orig), dir) ->
-        match acc with
-        | None -> None (* Already failed on a previous axis *)
-        | Some (tmin, tmax) ->
-          (* protect against division by near-zero values*)
-          let eps = 1e-12 in
-          if Float.(Float.abs dir < eps)
-          then
-            if Float.(orig < Interval.min ax) || Float.(orig > Interval.max ax)
-            then None
-            else Some (tmin, tmax)
-          else (
-            let adinv = 1.0 /. dir in
-            (* time when the ray enters the slab *)
-            let t0 = (Interval.min ax -. orig) *. adinv in
-            (* time when the ray exits the slab *)
-            let t1 = (Interval.max ax -. orig) *. adinv in
-            (* if direction is negative, adinv is negative, so t0 > t1. we need
-               t0 to be entry time (smaller) and t1 to be exit time (larger) *)
-            let tmin, tmax =
-              if Float.(t0 < t1)
-              then Float.max tmin t0, Float.min tmax t1
-              else Float.max tmin t1, Float.min tmax t0
-            in
-            (* if range is now empty or inverted, ray misses the box *)
-            if Float.( <= ) tmax tmin then None else Some (tmin, tmax)))
   in
   Option.is_some result
 ;;
@@ -78,11 +78,7 @@ let longest_axis aabb =
   let sx = Interval.size aabb.x in
   let sy = Interval.size aabb.y in
   let sz = Interval.size aabb.z in
-  if Float.(sx > sy)
-  then if Float.(sx > sz) then 0 else 2
-  else if Float.(sy > sz)
-  then 1
-  else 2
+  if sx > sy then if sx > sz then 0 else 2 else if sy > sz then 1 else 2
 ;;
 
 let axis_interval aabb i =

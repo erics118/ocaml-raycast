@@ -16,10 +16,10 @@ let hit s r interval =
   let half_b = Vec3.dot oc (Ray.direction r) in
   let c = Vec3.norm2 oc -. (s.radius *. s.radius) in
   let discriminant = (half_b *. half_b) -. (a *. c) in
-  if Float.(discriminant < 0.0)
+  if discriminant < 0.0
   then None
   else (
-    let sqrtd = Float.sqrt discriminant in
+    let sqrtd = sqrt discriminant in
     (* find nearest root that is in the valid range *)
     let r1 = (-.half_b -. sqrtd) /. a in
     let r2 = (-.half_b +. sqrtd) /. a in
@@ -36,9 +36,7 @@ let hit s r interval =
     | Some root ->
       let p = Ray.at r root in
       let outward_normal = Vec3.((p -^ current_center) /^ s.radius) in
-      let is_front_face =
-        Float.(Vec3.dot (Ray.direction r) outward_normal < 0.)
-      in
+      let is_front_face = Vec3.dot (Ray.direction r) outward_normal < 0. in
       Some
         { Hit_record.p
         ; normal =
