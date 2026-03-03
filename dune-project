@@ -19,7 +19,7 @@
  (name raytracer)
  (synopsis "A short synopsis")
  (description "A longer description")
- (depends ocaml ppx_deriving ppx_inline_test)
+ (depends ocaml ppx_deriving ppx_inline_test domainslib)
  (tags
   ("add topics" "to describe" your project)))
 

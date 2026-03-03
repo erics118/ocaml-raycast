@@ -149,20 +149,35 @@ let rec ray_color r world depth =
       Vec3.make 1. 1. 1.)
 ;;
 
+let generate_pixel camera world i j =
+  let pixel_color_sum = ref Vec3.zero in
+  for _s = 0 to camera.samples_per_pixel - 1 do
+    let ray = get_ray camera i j in
+    let color = ray_color ray world camera.max_depth in
+    pixel_color_sum := Vec3.(!pixel_color_sum +^ color)
+  done;
+  let pixel_color =
+    Vec3.(!pixel_color_sum /^ float_of_int camera.samples_per_pixel)
+  in
+  pixel_color
+;;
+
 let render camera world =
+  let num_pixels = camera.image_width * camera.image_height in
+  let pixels = Array.make num_pixels Vec3.zero in
+  let num_domains = max 1 (Domain.recommended_domain_count () - 1) in
+  let pool = Domainslib.Task.setup_pool ~num_domains () in
+  Domainslib.Task.run pool (fun () ->
+    Domainslib.Task.parallel_for
+      pool
+      ~start:0
+      ~finish:(camera.image_height - 1)
+      ~body:(fun j ->
+        for i = 0 to camera.image_width - 1 do
+          pixels.((j * camera.image_width) + i)
+          <- generate_pixel camera world i j
+        done));
+  Domainslib.Task.teardown_pool pool;
   Printf.printf "P3\n%d %d\n255\n" camera.image_width camera.image_height;
-  for j = 0 to camera.image_height - 1 do
-    for i = 0 to camera.image_width - 1 do
-      let pixel_color_sum = ref Vec3.zero in
-      for _s = 0 to camera.samples_per_pixel - 1 do
-        let ray = get_ray camera i j in
-        let color = ray_color ray world camera.max_depth in
-        pixel_color_sum := Vec3.(!pixel_color_sum +^ color)
-      done;
-      let pixel_color =
-        Vec3.(!pixel_color_sum /^ float_of_int camera.samples_per_pixel)
-      in
-      Color.write_color stdout pixel_color
-    done
-  done
+  Array.iter (fun c -> Color.write_color stdout c) pixels
 ;;
