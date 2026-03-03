@@ -1,4 +1,3 @@
-open Core
 module Vec3 = Raytracer.Vec3
 module Camera = Raytracer.Camera
 module World = Raytracer.World
@@ -67,15 +66,15 @@ let final_world () =
           0.2
           (Float.of_int b +. (0.9 *. Random.float 1.))
       in
-      if Float.(Vec3.norm Vec3.(center -^ Vec3.make 4. 0.2 0.) > 0.9)
+      if Vec3.norm Vec3.(center -^ Vec3.make 4. 0.2 0.) > 0.9
       then (
         let center2 = Vec3.(center +^ Vec3.make 0. (Random.float 0.5) 0.) in
         let sphere_material =
           match Random.float 1. with
-          | x when Float.(x < 0.8) ->
+          | x when x < 0.8 ->
             let albedo = Vec3.(random_color () **^ random_color ()) in
             Material.make_lambertian albedo
-          | x when Float.(x < 0.95) ->
+          | x when x < 0.95 ->
             let albedo = random_color_range 0.5 1. in
             let fuzz = Random.float 0.5 in
             Material.make_metal albedo fuzz

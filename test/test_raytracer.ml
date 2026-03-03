@@ -9,12 +9,12 @@ let float_eq a b = Float.(abs (a -. b) < eps)
 
 let%test "vec3_zero" =
   let v = Vec3.zero in
-  Float.(Vec3.x v = 0. && Vec3.y v = 0. && Vec3.z v = 0.)
+  Vec3.x v = 0. && Vec3.y v = 0. && Vec3.z v = 0.
 ;;
 
 let%test "vec3_make" =
   let v = Vec3.make 1. 2. 3. in
-  Float.(Vec3.x v = 1. && Vec3.y v = 2. && Vec3.z v = 3.)
+  Vec3.x v = 1. && Vec3.y v = 2. && Vec3.z v = 3.
 ;;
 
 let%test "vec3_add" =
@@ -35,7 +35,7 @@ let%test "ray_make" =
   let origin = Vec3.zero in
   let direction = Vec3.make 1. 0. 0. in
   let r = Ray.make origin direction in
-  Float.(Vec3.x (Ray.origin r) = 0. && Vec3.x (Ray.direction r) = 1.)
+  Vec3.x (Ray.origin r) = 0. && Vec3.x (Ray.direction r) = 1.
 ;;
 
 let%test "ray_at" =
