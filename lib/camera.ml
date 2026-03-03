@@ -48,17 +48,13 @@ let make
   let w = Vec3.normalize Vec3.(lookfrom -^ lookat) in
   let u = Vec3.normalize (Vec3.cross vup w) in
   let v = Vec3.cross w u in
-  let camera_center = lookfrom in
   let viewport_u = Vec3.(viewport_width *^ u) in
   let viewport_v = Vec3.(-.viewport_height *^ v) in
   let pixel_delta_u = Vec3.(viewport_u /^ float_of_int image_width) in
   let pixel_delta_v = Vec3.(viewport_v /^ float_of_int image_height) in
   let viewport_upper_left =
     Vec3.(
-      camera_center
-      -^ (focus_dist *^ w)
-      -^ (viewport_u /^ 2.)
-      -^ (viewport_v /^ 2.))
+      lookfrom -^ (focus_dist *^ w) -^ (viewport_u /^ 2.) -^ (viewport_v /^ 2.))
   in
   let pixel00_loc =
     Vec3.(viewport_upper_left +^ (pixel_delta_u /^ 2.) +^ (pixel_delta_v /^ 2.))
@@ -77,7 +73,7 @@ let make
   ; defocus_angle
   ; focus_dist
   ; samples_per_pixel
-  ; center = camera_center
+  ; center = lookfrom
   ; pixel00_loc
   ; pixel_delta_u
   ; pixel_delta_v
@@ -96,12 +92,9 @@ let sample_square () =
   Vec3.make r1 r2 0.
 ;;
 
-let random_in_unit_disk () =
-  let rec aux () =
-    let p = Vec3.make (Random.float 2. -. 1.) (Random.float 2. -. 1.) 0. in
-    if Vec3.dot p p >= 1. then aux () else p
-  in
-  aux ()
+let rec random_in_unit_disk () =
+  let p = Vec3.make (Random.float 2. -. 1.) (Random.float 2. -. 1.) 0. in
+  if Vec3.dot p p >= 1. then random_in_unit_disk () else p
 ;;
 
 let defocus_disk_sample (camera : t) =
@@ -150,16 +143,13 @@ let rec ray_color r world depth =
 ;;
 
 let generate_pixel camera world i j =
-  let pixel_color_sum = ref Vec3.zero in
+  let sum = ref Vec3.zero in
   for _s = 0 to camera.samples_per_pixel - 1 do
     let ray = get_ray camera i j in
     let color = ray_color ray world camera.max_depth in
-    pixel_color_sum := Vec3.(!pixel_color_sum +^ color)
+    sum := Vec3.(!sum +^ color)
   done;
-  let pixel_color =
-    Vec3.(!pixel_color_sum /^ float_of_int camera.samples_per_pixel)
-  in
-  pixel_color
+  Vec3.(!sum /^ float_of_int camera.samples_per_pixel)
 ;;
 
 let render camera world =
@@ -179,5 +169,5 @@ let render camera world =
         done));
   Domainslib.Task.teardown_pool pool;
   Printf.printf "P3\n%d %d\n255\n" camera.image_width camera.image_height;
-  Array.iter (fun c -> Color.write_color stdout c) pixels
+  Array.iter (Color.write_color stdout) pixels
 ;;

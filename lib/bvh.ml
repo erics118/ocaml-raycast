@@ -69,9 +69,7 @@ let rec hit bvh ray interval =
 ;;
 
 let to_hittable bvh =
-  { Hittable.hit = (fun ray interval -> hit bvh ray interval)
-  ; bounding_box = bounding_box bvh
-  }
+  { Hittable.hit = hit bvh; bounding_box = bounding_box bvh }
 ;;
 
 (** build a BVH from a list of hittables and return as a hittable *)

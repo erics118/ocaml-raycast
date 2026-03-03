@@ -20,9 +20,9 @@ let make_metal albedo fuzz =
   let fuzz = Float.max 0. (Float.min fuzz 1.) in
   { scatter =
       (fun r_in hr ->
-        let reflected = Vec3.reflect (Ray.direction r_in) hr.normal in
+        let reflected_dir = Vec3.reflect (Ray.direction r_in) hr.normal in
         let reflected =
-          Vec3.(normalize reflected +^ (fuzz *^ random_unit_vector ()))
+          Vec3.(normalize reflected_dir +^ (fuzz *^ random_unit_vector ()))
         in
         let scattered = Ray.make ~time:(Ray.time r_in) hr.p reflected in
         if Vec3.dot (Ray.direction scattered) hr.normal > 0.

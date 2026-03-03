@@ -62,10 +62,7 @@ let bounding_box s =
 
 let to_hittable s mat =
   { Hittable.hit =
-      (fun ray interval ->
-        match hit s ray interval with
-        | Some hr -> Some (hr, mat)
-        | None -> None)
+      (fun ray interval -> Option.map (fun hr -> hr, mat) (hit s ray interval))
   ; bounding_box = bounding_box s
   }
 ;;

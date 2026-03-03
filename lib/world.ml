@@ -5,7 +5,7 @@ type t =
 
 let make = function
   | [] -> { objects = []; bbox = Aabb.empty }
-  | _ as objects ->
+  | objects ->
     let bvh = Bvh.make objects in
     { objects = [ bvh ]; bbox = bvh.bounding_box }
 ;;

@@ -81,9 +81,7 @@ let bounding_box plane =
 let to_hittable plane mat =
   { Hittable.hit =
       (fun ray interval ->
-        match hit plane ray interval with
-        | Some hr -> Some (hr, mat)
-        | None -> None)
+        Option.map (fun hr -> hr, mat) (hit plane ray interval))
   ; bounding_box = bounding_box plane
   }
 ;;
