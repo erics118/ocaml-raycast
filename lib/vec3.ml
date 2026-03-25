@@ -5,33 +5,33 @@ type t =
   }
 
 (* constructors *)
-let make x y z = { x; y; z }
+let[@inline] make x y z = { x; y; z }
 let zero = make 0. 0. 0.
 
 (* accessors *)
-let x v = v.x
-let y v = v.y
-let z v = v.z
+let[@inline] x v = v.x
+let[@inline] y v = v.y
+let[@inline] z v = v.z
 
 (* basic operations *)
-let neg v = make (-.v.x) (-.v.y) (-.v.z)
-let add a b = make (a.x +. b.x) (a.y +. b.y) (a.z +. b.z)
-let sub a b = make (a.x -. b.x) (a.y -. b.y) (a.z -. b.z)
-let mul a b = make (a.x *. b.x) (a.y *. b.y) (a.z *. b.z)
-let scale k v = make (k *. v.x) (k *. v.y) (k *. v.z)
-let div v k = make (v.x /. k) (v.y /. k) (v.z /. k)
+let[@inline] neg v = make (-.v.x) (-.v.y) (-.v.z)
+let[@inline] add a b = make (a.x +. b.x) (a.y +. b.y) (a.z +. b.z)
+let[@inline] sub a b = make (a.x -. b.x) (a.y -. b.y) (a.z -. b.z)
+let[@inline] mul a b = make (a.x *. b.x) (a.y *. b.y) (a.z *. b.z)
+let[@inline] scale k v = make (k *. v.x) (k *. v.y) (k *. v.z)
+let[@inline] div v k = make (v.x /. k) (v.y /. k) (v.z /. k)
 
 (* infix operators *)
-let ( +^ ) = add
-let ( -^ ) = sub
-let ( *^ ) k v = scale k v
-let ( **^ ) = mul
-let ( /^ ) v k = div v k
+let[@inline] ( +^ ) a b = add a b
+let[@inline] ( -^ ) a b = sub a b
+let[@inline] ( *^ ) k v = scale k v
+let[@inline] ( **^ ) a b = mul a b
+let[@inline] ( /^ ) v k = div v k
 
 (* dot, cross *)
-let dot a b = (a.x *. b.x) +. (a.y *. b.y) +. (a.z *. b.z)
+let[@inline] dot a b = (a.x *. b.x) +. (a.y *. b.y) +. (a.z *. b.z)
 
-let cross a b =
+let cross[@inline] a b =
   make
     ((a.y *. b.z) -. (a.z *. b.y))
     ((a.z *. b.x) -. (a.x *. b.z))
@@ -39,10 +39,10 @@ let cross a b =
 ;;
 
 (* norms *)
-let norm2 v = dot v v
-let norm v = sqrt (norm2 v)
+let[@inline] norm2 v = dot v v
+let[@inline] norm v = sqrt (norm2 v)
 
-let normalize v =
+let[@inline] normalize v =
   let n = norm v in
   if n = 0. then zero else 1. /. n *^ v
 ;;
@@ -64,14 +64,14 @@ let random_unit_vector () =
   make x y z
 ;;
 
-let near_zero v =
+let[@inline] near_zero v =
   let s = 1e-8 in
   Float.abs v.x < s && Float.abs v.y < s && Float.abs v.z < s
 ;;
 
-let reflect v n = sub v (2. *. dot v n *^ n)
+let[@inline] reflect v n = sub v (2. *. dot v n *^ n)
 
-let refract uv n etai_over_etat =
+let[@inline] refract uv n etai_over_etat =
   let cos_theta = Float.min (dot (neg uv) n) 1. in
   let r_out_perp = etai_over_etat *^ (uv +^ (cos_theta *^ n)) in
   let r_out_parallel = -.Float.sqrt (Float.abs (1. -. norm2 r_out_perp)) *^ n in
