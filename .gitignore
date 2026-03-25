@@ -36,3 +36,9 @@ setup.log
 _opam/
 
 *.ppm
+
+# xctrace
+*.trace
+
+.direnv
+.envrc
