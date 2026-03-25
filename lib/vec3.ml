@@ -31,7 +31,7 @@ let[@inline] ( /^ ) v k = div v k
 (* dot, cross *)
 let[@inline] dot a b = (a.x *. b.x) +. (a.y *. b.y) +. (a.z *. b.z)
 
-let cross[@inline] a b =
+let[@inline] cross a b =
   make
     ((a.y *. b.z) -. (a.z *. b.y))
     ((a.z *. b.x) -. (a.x *. b.z))
