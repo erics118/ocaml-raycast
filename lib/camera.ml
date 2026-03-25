@@ -133,7 +133,7 @@ let rec ray_color r world depth =
   else (
     match World.hit_world world r (Interval.make 0.001 Float.infinity) with
     | Some (hr, mat) ->
-      (match mat.Material.scatter r hr with
+      (match Material.scatter mat r hr with
        | Some (attenuation, scattered) ->
          Vec3.(attenuation **^ ray_color scattered world (depth - 1))
        | None -> Vec3.zero)
